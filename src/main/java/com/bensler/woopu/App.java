@@ -23,9 +23,9 @@ public class App {
 
       final Image scaledBackground = Piece.backgroundImg.getScaledInstance(300);
       final JLabel label = new JLabel(new ImageIcon(scaledBackground));
-
       label.setBorder(new LineBorder(Color.red, 1));
-      new ApplicationFrame("WooPu", label);
+
+      new ApplicationFrame("WooPu", new FieldComponent(scaledBackground));
     }
 
 }
