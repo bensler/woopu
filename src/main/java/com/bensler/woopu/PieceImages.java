@@ -2,7 +2,7 @@ package com.bensler.woopu;
 
 import java.io.IOException;
 
-public class Piece {
+public class PieceImages {
 
   public final static int GRID_SIZE = 360;
 

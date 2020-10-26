@@ -7,11 +7,13 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
+/**
+ * TODO
+ */
 public class FieldComponent extends JComponent {
 
   private final ImageIcon backgroundImg;
   private final ImageIcon bluePiece;
-
 
   public FieldComponent(Image aBackgroundImg) {
     backgroundImg = new ImageIcon(aBackgroundImg);
@@ -21,7 +23,7 @@ public class FieldComponent extends JComponent {
     setPreferredSize(size);
     setMaximumSize(size);
 
-    bluePiece = new ImageIcon(Piece.pieceBlue.getScaledInstance(130));
+    bluePiece = new ImageIcon(PieceImages.pieceBlue.getScaledInstance(130));
   }
 
   @Override
