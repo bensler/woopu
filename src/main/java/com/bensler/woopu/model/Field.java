@@ -28,7 +28,12 @@ public class Field {
       ) {
         throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, width, height));
       }
-
+      for (Piece piece : pieces) {
+        if (piece.intersectWith(newPiece)) {
+          throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, width, height));
+        }
+      }
+      pieces.add(newPiece);
     }
   }
 

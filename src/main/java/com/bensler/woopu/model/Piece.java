@@ -17,7 +17,7 @@ public class Piece {
   }
 
   public int getRightX() {
-    return x + type.gridWidth;
+    return x + type.width;
   }
 
   public int getTopY() {
@@ -25,12 +25,19 @@ public class Piece {
   }
 
   public int getBottomY() {
-    return y + type.gridHeight;
+    return y + type.height;
   }
 
   @Override
   public String toString() {
     return String.format("Piece[%s, %d, %d]", type.name(), x, x);
+  }
+
+  public boolean intersectWith(Piece other) {
+    return (
+         (x + type.width >= other.x) && (x <= other.x + other.type.width)
+      || (y + type.height >= other.y) && (y <= other.y + other.type.height)
+    );
   }
 
 }

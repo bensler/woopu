@@ -10,12 +10,12 @@ public enum PieceType {
   RED_VERTICAL(1, 2),   // red dot 1x2
   BLUE(2, 2);           // blue dot 2x2
 
-  public final int gridWidth;
-  public final int gridHeight;
+  public final int width;
+  public final int height;
 
   PieceType(int aGridWidth, int aGridHeight) {
-    gridWidth = aGridWidth;
-    gridHeight = aGridHeight;
+    width = aGridWidth;
+    height = aGridHeight;
   }
 
 }
