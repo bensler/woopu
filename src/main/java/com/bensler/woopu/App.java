@@ -21,7 +21,7 @@ public class App {
     public static void main(String[] args) throws UnsupportedLookAndFeelException, IOException {
       LookUtils.setLookAndTheme(new PlasticLookAndFeel(), new DesertYellow());
 
-      final Image scaledBackground = PieceImages.backgroundImg.getScaledInstance(300);
+      final Image scaledBackground = ImageSource.backgroundImg.getScaledInstance(300);
       final JLabel label = new JLabel(new ImageIcon(scaledBackground));
       label.setBorder(new LineBorder(Color.red, 1));
 

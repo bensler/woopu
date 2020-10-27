@@ -14,19 +14,19 @@ public class FieldTest {
   @Test
   public void testFieldBorders() {
     try {
-      new Field(4, 5, new Piece(YELLOW, -1, 0));
+      new Field(new Piece(YELLOW, -1, 0));
       assertFalse(true);
     } catch (IllegalArgumentException iae) { /* iae expected */ }
     try {
-      new Field(4, 5, new Piece(RED_HORIZONTAL, 3, 0));
+      new Field(new Piece(RED_HORIZONTAL, 3, 0));
       assertFalse(true);
     } catch (IllegalArgumentException iae) { /* iae expected */ }
     try {
-      new Field(4, 5, new Piece(RED_VERTICAL, 2, -1));
+      new Field(new Piece(RED_VERTICAL, 2, -1));
       assertFalse(true);
     } catch (IllegalArgumentException iae) { /* iae expected */ }
     try {
-      new Field(4, 5, new Piece(BLUE, 1, 4));
+      new Field(new Piece(BLUE, 1, 4));
       assertFalse(true);
     } catch (IllegalArgumentException iae) { /* iae expected */ }
   }
@@ -34,28 +34,28 @@ public class FieldTest {
   @Test
   public void testPieceIntersection() {
     try {
-      new Field(4, 5,
+      new Field(
         new Piece(BLUE, 1, 1),
         new Piece(YELLOW, 2, 1)
       );
       fail();
     } catch (IllegalArgumentException iae) { /* iae expected */ }
     try {
-      new Field(4, 5,
+      new Field(
         new Piece(BLUE, 2, 1),
         new Piece(RED_HORIZONTAL, 1, 2)
       );
       fail();
     } catch (IllegalArgumentException iae) { /* iae expected */ }
     try {
-      new Field(4, 5,
+      new Field(
         new Piece(BLUE, 2, 2),
         new Piece(RED_VERTICAL, 2, 1)
       );
       fail();
     } catch (IllegalArgumentException iae) { /* iae expected */ }
     try {
-      new Field(4, 5,
+      new Field(
         new Piece(BLUE, 2, 2),
         new Piece(YELLOW, 2, 3)
       );

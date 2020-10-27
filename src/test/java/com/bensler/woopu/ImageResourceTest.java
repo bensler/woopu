@@ -5,12 +5,12 @@ import org.junit.Test;
 public class ImageResourceTest {
 
   /**
-   * Just trigger {@link PieceImages} class loading, which checks availability
+   * Just trigger {@link ImageSource} class loading, which checks availability
    * of image resources and their sizes.
    */
   @Test
   public void loadImageResources() {
-    PieceImages.backgroundImg.hashCode();
+    ImageSource.backgroundImg.hashCode();
   }
 
 }

@@ -7,8 +7,10 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
+import com.bensler.woopu.model.Field;
+
 /**
- * TODO
+ * {@link JComponent} displaying a {@link Field} on screen.
  */
 public class FieldComponent extends JComponent {
 
@@ -23,7 +25,7 @@ public class FieldComponent extends JComponent {
     setPreferredSize(size);
     setMaximumSize(size);
 
-    bluePiece = new ImageIcon(PieceImages.pieceBlue.getScaledInstance(130));
+    bluePiece = new ImageIcon(ImageSource.pieceBlueImg.getScaledInstance(130));
   }
 
   @Override

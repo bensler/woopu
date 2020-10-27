@@ -11,26 +11,25 @@ import java.util.List;
  */
 public class Field {
 
-  private final int width;
-  private final int height;
+  public static final int WIDTH  = 4;
+  public static final int HEIGHT = 5;
+
   private final List<Piece> pieces;
 
-  public Field(int aWidth, int aHeight, Piece... newPieces) {
-    width = aWidth;
-    height = aHeight;
+  public Field(Piece... newPieces) {
     pieces = new ArrayList<>();
     for (Piece newPiece : newPieces) {
       if (
         (newPiece.getLeftX() < 0)
-        || (newPiece.getRightX() >= width)
+        || (newPiece.getRightX() >= WIDTH)
         || (newPiece.getTopY() < 0)
-        || (newPiece.getBottomY() >= height)
+        || (newPiece.getBottomY() >= HEIGHT)
       ) {
-        throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, width, height));
+        throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, WIDTH, HEIGHT));
       }
       for (Piece piece : pieces) {
         if (piece.intersectWith(newPiece)) {
-          throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, width, height));
+          throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, WIDTH, HEIGHT));
         }
       }
       pieces.add(newPiece);
