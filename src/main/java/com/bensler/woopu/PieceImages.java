@@ -14,7 +14,7 @@ public class PieceImages {
 
   static {
     try {
-      backgroundImg = new ImageResource(App.class, "background.png", 1645, 2000);
+      backgroundImg = new ImageResource(App.class, "background.png", 1640, 2000);
       pieceYellowImg = new ImageResource(App.class, "piece-yellow.png", GRID_SIZE, GRID_SIZE);
       pieceRedHorizontal = new ImageResource(App.class, "piece-red-horizontal.png", 2 * GRID_SIZE, GRID_SIZE);
       pieceRedVertical = new ImageResource(App.class, "piece-red-vertical.png", GRID_SIZE, 2 * GRID_SIZE);
