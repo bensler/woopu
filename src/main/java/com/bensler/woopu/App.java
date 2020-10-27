@@ -25,7 +25,7 @@ public class App {
       final JLabel label = new JLabel(new ImageIcon(scaledBackground));
       label.setBorder(new LineBorder(Color.red, 1));
 
-      new ApplicationFrame("WooPu", new FieldComponent(scaledBackground));
+      new ApplicationFrame("WooPu", ImageSource.windowIcon.getImage(), new FieldComponent(scaledBackground));
     }
 
 }

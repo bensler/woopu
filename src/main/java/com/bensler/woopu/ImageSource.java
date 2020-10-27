@@ -15,6 +15,7 @@ public class ImageSource {
   public final static int GRID_SIZE  = 36;
   public final static int FRAME_SIZE = 10;
 
+  public final static ImageResource windowIcon;
   public final static ImageResource backgroundImg;
   public final static ImageResource pieceYellowImg;
   public final static ImageResource pieceRedHorizontalImg;
@@ -23,6 +24,7 @@ public class ImageSource {
 
   static {
     try {
+      windowIcon = new ImageResource(App.class, "window-icon.png", 385, 339);
       backgroundImg = new ImageResource(
         App.class, "background.png",
         ((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * ORIGINAL_IMG_FACTOR,

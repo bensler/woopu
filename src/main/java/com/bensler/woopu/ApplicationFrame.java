@@ -3,6 +3,7 @@ package com.bensler.woopu;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -21,8 +22,9 @@ import javax.swing.WindowConstants;
  */
 public class ApplicationFrame extends JFrame {
 
-  public ApplicationFrame(String title, Component frameContent) {
+  public ApplicationFrame(String title, Image iconImg, Component frameContent) {
     super(title);
+    setIconImage(iconImg);
     getContentPane().add(frameContent, BorderLayout.CENTER);
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setVisible(true);

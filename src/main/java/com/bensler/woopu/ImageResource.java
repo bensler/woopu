@@ -46,4 +46,8 @@ public class ImageResource {
     return image.getScaledInstance(width, -1, Image.SCALE_SMOOTH);
   }
 
+  public BufferedImage getImage() {
+    return image;
+  }
+
 }
