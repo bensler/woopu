@@ -29,11 +29,16 @@ public class Field {
       }
       for (Piece piece : pieces) {
         if (piece.intersectWith(newPiece)) {
-          throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, WIDTH, HEIGHT));
+          throw new IllegalArgumentException(String.format("%s overlaps with %s", newPiece, piece));
         }
       }
       pieces.add(newPiece);
     }
+  }
+
+  /** copy constructor */
+  public Field(Field field) {
+    this(field.pieces.toArray(new Piece[field.pieces.size()]));
   }
 
 }
