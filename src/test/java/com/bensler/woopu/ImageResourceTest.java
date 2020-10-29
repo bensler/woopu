@@ -10,7 +10,7 @@ public class ImageResourceTest {
    */
   @Test
   public void loadImageResources() {
-    ImageSource.backgroundImg.hashCode();
+    new ImageSource();
   }
 
 }

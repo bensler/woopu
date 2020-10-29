@@ -1,5 +1,6 @@
 package com.bensler.woopu;
 
+import java.awt.Image;
 import java.io.IOException;
 
 import com.bensler.woopu.model.Field;
@@ -15,19 +16,19 @@ public class ImageSource {
   public final static int GRID_SIZE  = 36;
   public final static int FRAME_SIZE = 10;
 
-  public final static ImageResource windowIcon;
-  public final static ImageResource backgroundImg;
-  public final static ImageResource pieceYellowImg;
-  public final static ImageResource pieceRedHorizontalImg;
-  public final static ImageResource pieceRedVerticalImg;
-  public final static ImageResource pieceBlueImg;
+  final ImageResource windowIcon;
+  final ImageResource backgroundImg;
+  final ImageResource pieceYellowImg;
+  final ImageResource pieceRedHorizontalImg;
+  final ImageResource pieceRedVerticalImg;
+  final ImageResource pieceBlueImg;
 
-  static {
+  ImageSource() {
     try {
       windowIcon = new ImageResource(App.class, "window-icon.png", 385, 339);
       backgroundImg = new ImageResource(
         App.class, "background.png",
-        ((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * ORIGINAL_IMG_FACTOR,
+        getBackgroundImgWidth(ORIGINAL_IMG_FACTOR),
         ((2 * FRAME_SIZE) + (Field.HEIGHT * GRID_SIZE)) * ORIGINAL_IMG_FACTOR
       );
       pieceYellowImg =        loadImageResource("piece-yellow.png",         PieceType.YELLOW);
@@ -39,7 +40,15 @@ public class ImageSource {
     }
   }
 
-  private static ImageResource loadImageResource(String resourceName, PieceType pieceType) throws IOException {
+  private int getBackgroundImgWidth(int factor) {
+    return ((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * factor;
+  }
+
+  Image getBackgroundImage(int factor) {
+    return backgroundImg.getScaledInstance(getBackgroundImgWidth(factor));
+  }
+
+  private ImageResource loadImageResource(String resourceName, PieceType pieceType) throws IOException {
     final int actualGridSize = GRID_SIZE * ORIGINAL_IMG_FACTOR;
 
     return new ImageResource(
