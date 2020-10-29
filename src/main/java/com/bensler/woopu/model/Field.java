@@ -1,6 +1,7 @@
 package com.bensler.woopu.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  *
  * Coordinate System originates at the top left corner and starts with (0, 0).
  */
-public class Field {
+public class Field implements Iterable<Piece> {
 
   public static final int WIDTH  = 4;
   public static final int HEIGHT = 5;
@@ -39,6 +40,11 @@ public class Field {
   /** copy constructor */
   public Field(Field field) {
     this(field.pieces.toArray(new Piece[field.pieces.size()]));
+  }
+
+  @Override
+  public Iterator<Piece> iterator() {
+    return pieces.iterator();
   }
 
 }

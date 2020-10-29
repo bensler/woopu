@@ -17,7 +17,7 @@ public class App {
       LookUtils.setLookAndTheme(new PlasticLookAndFeel(), new DesertYellow());
 
       final ImageSource imgSrc = new ImageSource();
-      new ApplicationFrame("WooPu", imgSrc.windowIcon.getImage(), new FieldComponent(3, imgSrc));
+      new ApplicationFrame("WooPu", imgSrc.windowIcon.getImage(), new FieldComponent(3, imgSrc, Fields.A.getField()));
     }
 
 }

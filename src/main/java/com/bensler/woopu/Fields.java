@@ -117,7 +117,7 @@ public enum Fields {
     new Piece(RED_HORIZONTAL, 2, 4)
   ));
 
-  final Field field;
+  private final Field field;
 
   Fields(Field aField) {
     field = aField;

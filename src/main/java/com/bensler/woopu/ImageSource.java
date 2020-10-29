@@ -2,12 +2,17 @@ package com.bensler.woopu;
 
 import java.awt.Image;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.model.PieceType;
 
 /**
  * Provides loaded image resources as static fields. Image sizes are checked on loading.
+ * TODO
  */
 public class ImageSource {
 
@@ -17,35 +22,28 @@ public class ImageSource {
   public final static int FRAME_SIZE = 10;
 
   final ImageResource windowIcon;
-  final ImageResource backgroundImg;
-  final ImageResource pieceYellowImg;
-  final ImageResource pieceRedHorizontalImg;
-  final ImageResource pieceRedVerticalImg;
-  final ImageResource pieceBlueImg;
+  final FieldImageSource originalImages;
 
   ImageSource() {
     try {
       windowIcon = new ImageResource(App.class, "window-icon.png", 385, 339);
-      backgroundImg = new ImageResource(
-        App.class, "background.png",
-        getBackgroundImgWidth(ORIGINAL_IMG_FACTOR),
-        ((2 * FRAME_SIZE) + (Field.HEIGHT * GRID_SIZE)) * ORIGINAL_IMG_FACTOR
+      final HashMap<PieceType, Image> imgMap = new HashMap<>();
+
+      putImage("piece-yellow.png",         PieceType.YELLOW, imgMap);
+      putImage("piece-red-horizontal.png", PieceType.RED_HORIZONTAL, imgMap);
+      putImage("piece-red-vertical.png",   PieceType.RED_VERTICAL, imgMap);
+      putImage("piece-blue.png",           PieceType.BLUE, imgMap);
+      originalImages = new FieldImageSource(
+        new ImageResource(
+          App.class, "background.png",
+          getBackgroundImgWidth(ORIGINAL_IMG_FACTOR),
+          ((2 * FRAME_SIZE) + (Field.HEIGHT * GRID_SIZE)) * ORIGINAL_IMG_FACTOR
+        ).getImage(),
+        imgMap
       );
-      pieceYellowImg =        loadImageResource("piece-yellow.png",         PieceType.YELLOW);
-      pieceRedHorizontalImg = loadImageResource("piece-red-horizontal.png", PieceType.RED_HORIZONTAL);
-      pieceRedVerticalImg =   loadImageResource("piece-red-vertical.png",   PieceType.RED_VERTICAL);
-      pieceBlueImg =          loadImageResource("piece-blue.png",           PieceType.BLUE);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private int getBackgroundImgWidth(int factor) {
-    return ((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * factor;
-  }
-
-  Image getBackgroundImage(int factor) {
-    return backgroundImg.getScaledInstance(getBackgroundImgWidth(factor));
   }
 
   private ImageResource loadImageResource(String resourceName, PieceType pieceType) throws IOException {
@@ -53,6 +51,26 @@ public class ImageSource {
 
     return new ImageResource(
       App.class, resourceName, pieceType.width * actualGridSize, pieceType.height * actualGridSize
+    );
+  }
+
+  private void putImage(String fileName, PieceType type, Map<PieceType, Image> targetMap) throws IOException {
+    targetMap.put(type, loadImageResource(fileName, type).getImage());
+  }
+
+  private int getBackgroundImgWidth(int factor) {
+    return ((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * factor;
+  }
+
+  FieldImageSource getFieldImageSource(int scaleFactor) {
+    return new FieldImageSource(
+      originalImages.getBackgroundImage().getScaledInstance(getBackgroundImgWidth(scaleFactor), -1, Image.SCALE_SMOOTH),
+      Arrays.asList(PieceType.values()).stream().collect(Collectors.toMap(
+        type -> type,
+        type -> originalImages.getPieceImage(type).getScaledInstance(
+          GRID_SIZE * scaleFactor * type.width, -1, Image.SCALE_SMOOTH
+        )
+      ))
     );
   }
 

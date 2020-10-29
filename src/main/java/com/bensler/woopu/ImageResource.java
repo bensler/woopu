@@ -7,16 +7,15 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+/** TODO */
 public class ImageResource {
 
   private final String resourceName;
-  private final int width;
-  private final int height;
   private final BufferedImage image;
 
   public ImageResource(
     Class<?> resourceParentClass, String aResourceName,
-    int aWidth, int aHeight
+    int width, int height
   ) throws IOException {
     final URL resource = resourceParentClass.getResource(resourceName = aResourceName);
 
@@ -30,12 +29,12 @@ public class ImageResource {
     final int imgWidth = image.getWidth();
     final int imgHeight = image.getHeight();
 
-    if (imgWidth != (width = aWidth)) {
+    if (imgWidth != width) {
       throw new IllegalArgumentException(String.format(
         "Image resource \"%s\" width mismatch. Expected: %d but %d found.", resourceName, width, imgWidth
       ));
     }
-    if (imgHeight != (height = aHeight)) {
+    if (imgHeight != height) {
       throw new IllegalArgumentException(String.format(
         "Image resource \"%s\" height mismatch. Expected: %d but %d found.", resourceName, height, imgHeight
       ));
