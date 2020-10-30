@@ -58,17 +58,17 @@ public class ImageSource {
     targetMap.put(type, loadImageResource(fileName, type).getImage());
   }
 
-  private int getBackgroundImgWidth(int factor) {
-    return ((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * factor;
+  private int getBackgroundImgWidth(float factor) {
+    return Math.round(((2 * FRAME_SIZE) + (Field.WIDTH  * GRID_SIZE)) * factor);
   }
 
-  FieldImageSource getFieldImageSource(int scaleFactor) {
+  FieldImageSource getFieldImageSource(float scaleFactor) {
     return new FieldImageSource(
       originalImages.getBackgroundImage().getScaledInstance(getBackgroundImgWidth(scaleFactor), -1, Image.SCALE_SMOOTH),
       Arrays.asList(PieceType.values()).stream().collect(Collectors.toMap(
         type -> type,
         type -> originalImages.getPieceImage(type).getScaledInstance(
-          GRID_SIZE * scaleFactor * type.width, -1, Image.SCALE_SMOOTH
+          Math.round(GRID_SIZE * scaleFactor * type.width), -1, Image.SCALE_SMOOTH
         )
       ))
     );
