@@ -55,7 +55,7 @@ public class App implements ActionListener {
 
     for (int i = 0; i < fields.length; i++) {
       final Field field = fields[i].getField();
-      final JButton btn = new JButton("A", new ComponentIconAdapter(new FieldComponent(0.3f, imgSrc, field)));
+      final JButton btn = new JButton(new ComponentIconAdapter(new FieldComponent(0.3f, imgSrc, field)));
 
       btn.setBorder(new EmptyBorder(10, 10, 10, 10));
       btnToField.put(btn, field);
