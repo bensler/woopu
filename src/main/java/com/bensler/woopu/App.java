@@ -1,5 +1,6 @@
 package com.bensler.woopu;
 
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
 
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.util.ComponentIconAdapter;
@@ -37,7 +37,7 @@ public class App implements ActionListener {
 
     final ImageSource imgSrc = new ImageSource();
     final JPanel mainPanel = new JPanel(new FormLayout(
-      "4dlu, c:p:g, 4dlu, p, 4dlu",
+      "4dlu, c:p:g, 10dlu, p, 4dlu",
       "4dlu, t:p:g, 4dlu"
     ));
 
@@ -57,7 +57,7 @@ public class App implements ActionListener {
       final Field field = fields[i].getField();
       final JButton btn = new JButton(new ComponentIconAdapter(new FieldComponent(0.3f, imgSrc, field)));
 
-      btn.setBorder(new EmptyBorder(10, 10, 10, 10));
+      btn.setMargin(new Insets(5, 5, 5, 5));
       btnToField.put(btn, field);
       btn.addActionListener(this);
       buttonPanel.add(btn, new CellConstraints(1, (i * 2) + 1));
