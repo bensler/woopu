@@ -1,17 +1,15 @@
 package com.bensler.woopu.util;
 
+import java.awt.Graphics;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** TODO
- * bla
- * <pre>
- * try (Resource<Graphics> g2 = new Resource<>(g.create(), subG -> subG.dispose())) {
- *   g2.resource.translate(x, y);
- *   paintComponent(g2.resource);
- * }
- * </pre>
- * bla
+/**
+ * A Resource implementing {@link AutoCloseable} to make the try-with-resource
+ * idiom useable with any other class (not implementing {@link AutoCloseable}).
+ * <p>
+ * Example: a {@link Graphics} object needs to be disposed after use. Usually
+ * this would be achieved like that:
  * <pre>
  * final Graphics subG = g.create();
  *
@@ -22,6 +20,15 @@ import java.util.function.Supplier;
  *   subG.dispose();
  * }
  * </pre>
+ * By wrapping any resource into a {@link Resource} object this can be done in
+ * a shorter way:
+ * <pre>
+ * try (Resource<Graphics> g2 = new Resource<>(g.create(), subG -> subG.dispose())) {
+ *   g2.resource.translate(x, y);
+ *   paintComponent(g2.resource);
+ * }
+ * </pre>
+ * Not sure if readability is really better ... .
  */
 public class Resource<R> implements AutoCloseable {
 

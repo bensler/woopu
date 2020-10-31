@@ -7,7 +7,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 
 /**
- * TODO
+ * Implements the {@link Icon} interface by drawing a random {@link JComponent}.
  */
 public class ComponentIconAdapter implements Icon {
 
@@ -17,9 +17,10 @@ public class ComponentIconAdapter implements Icon {
     component = aComponent;
     component.setSize(component.getPreferredSize());
   }
+
   @Override
   public void paintIcon(Component c, Graphics g, int x, int y) {
-    try (Resource<Graphics> g2 = new Resource<>(g.create(), subG -> subG.dispose())) {
+    try (final Resource<Graphics> g2 = new Resource<>(g.create(), subG -> subG.dispose())) {
       g2.resource.translate(x, y);
       component.paint(g2.resource);
     }
