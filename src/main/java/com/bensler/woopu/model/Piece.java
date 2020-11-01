@@ -3,13 +3,21 @@ package com.bensler.woopu.model;
 public class Piece {
 
   public final PieceType type;
-  public final int x;
-  public final int y;
+  private final int x;
+  private final int y;
 
   public Piece(PieceType aType, int aX, int aY) {
     type = aType;
     x = aX;
     y = aY;
+  }
+
+  public int getWidth() {
+    return type.width;
+  }
+
+  public int getHeight() {
+    return type.height;
   }
 
   public int getLeftX() {
@@ -37,6 +45,13 @@ public class Piece {
     return (
          (getRightX()  >= other.x) && (x <= other.getRightX())
       && (getBottomY() >= other.y) && (y <= other.getBottomY())
+    );
+  }
+
+  public boolean covers(int xPos, int yPos) {
+    return (
+         (xPos >= getLeftX()) && (xPos <= getRightX())
+      && (yPos >= getTopY()) && (yPos <= getBottomY())
     );
   }
 

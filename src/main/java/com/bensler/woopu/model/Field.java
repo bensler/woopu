@@ -1,8 +1,8 @@
 package com.bensler.woopu.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Represents a state of play field. It ensures that {@link Piece}s do not
@@ -10,7 +10,7 @@ import java.util.List;
  *
  * Coordinate System originates at the top left corner and starts with (0, 0).
  */
-public class Field implements Iterable<Piece> {
+public class Field {
 
   public static final int WIDTH  = 4;
   public static final int HEIGHT = 5;
@@ -28,6 +28,7 @@ public class Field implements Iterable<Piece> {
       ) {
         throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, WIDTH, HEIGHT));
       }
+
       for (Piece piece : pieces) {
         if (piece.intersectWith(newPiece)) {
           throw new IllegalArgumentException(String.format("%s overlaps with %s", newPiece, piece));
@@ -42,9 +43,12 @@ public class Field implements Iterable<Piece> {
     this(field.pieces.toArray(new Piece[field.pieces.size()]));
   }
 
-  @Override
-  public Iterator<Piece> iterator() {
-    return pieces.iterator();
+  public Stream<Piece> pieces() {
+    return pieces.stream();
+  }
+
+  public Piece pieceAt(int x, int y) {
+    return pieces().filter(piece -> piece.covers(x, y)).findFirst().orElse(null);
   }
 
 }

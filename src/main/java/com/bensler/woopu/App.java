@@ -41,7 +41,7 @@ public class App implements ActionListener {
       "4dlu, t:p:g, 4dlu"
     ));
 
-    mainPanel.add(mainFieldComp = new FieldComponent(3, imgSrc, new Field()), new CellConstraints(2, 2));
+    mainPanel.add(mainFieldComp = new InteractiveFieldComponent(3, imgSrc, new Field()), new CellConstraints(2, 2));
     mainPanel.add(createButtonPanel(imgSrc), new CellConstraints(4, 2));
     new ApplicationFrame("WooPu", imgSrc.windowIcon.getImage(), mainPanel);
   }
