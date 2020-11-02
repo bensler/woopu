@@ -3,6 +3,8 @@ package com.bensler.woopu;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -30,6 +32,25 @@ public class InteractiveFieldComponent extends FieldComponent {
 
     addMouseMotionListener(leAdapteurDeMouse);
     addMouseListener(leAdapteurDeMouse);
+    addKeyListener(new KeyListener() {
+
+      @Override
+      public void keyTyped(KeyEvent e) {
+        System.out.println(e.getKeyChar());
+      }
+
+      @Override
+      public void keyReleased(KeyEvent e) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void keyPressed(KeyEvent e) {
+        // TODO Auto-generated method stub
+
+      }
+    });
   }
 
   void selectCandidate() {
@@ -37,6 +58,7 @@ public class InteractiveFieldComponent extends FieldComponent {
       selectedPiece = selectionCandidate;
       repaint();
     }
+    requestFocus();
   }
 
   void mouseOver(Point mousePos) {
@@ -74,12 +96,12 @@ public class InteractiveFieldComponent extends FieldComponent {
   }
 
   private void drawFrame(Graphics g, Piece selectedPiece, int lineWidth) {
-    g.setColor(Color.RED);
     final int x = frameWidth + (gridWidth * selectedPiece.getLeftX() + 2);
     final int y = frameWidth + (gridWidth * selectedPiece.getTopY()) + 2;
     final int width = (gridWidth * selectedPiece.getWidth()) - 4;
     final int height = (gridWidth * selectedPiece.getHeight()) - 4;
 
+    g.setColor(Color.RED);
     for (int i = 0; i < lineWidth; i++) {
       g.drawRoundRect(x + i, y + i, width - (2 * i), height - (2 * i), 20 - (2 * i), 20 - (2 * i));
     }
