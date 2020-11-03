@@ -3,52 +3,71 @@ package com.bensler.woopu;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Map;
 
+import com.bensler.woopu.model.Direction;
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.model.Piece;
 
 public class InteractiveFieldComponent extends FieldComponent {
+
+  private final static Map<Integer, Direction> keyCodeDirectionMap = Map.of(
+    KeyEvent.VK_UP,    Direction.NORTH,
+    KeyEvent.VK_RIGHT, Direction.EAST,
+    KeyEvent.VK_DOWN,  Direction.SOUTH,
+    KeyEvent.VK_LEFT,  Direction.WEST
+  );
 
   private Piece selectedPiece;
   private Piece selectionCandidate;
 
   public InteractiveFieldComponent(float gridScaleFactor, ImageSource anImgSrc, Field aField) {
     super(gridScaleFactor, anImgSrc, aField);
-
     final MouseAdapter leAdapteurDeMouse = new MouseAdapter() {
       @Override
       public void mouseMoved(MouseEvent evt) {
         mouseOver(evt.getPoint());
       }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        mouseOver(new Point(-1, -1));
+      }
+
       @Override
       public void mouseClicked(MouseEvent evt) {
         selectCandidate();
       }
     };
 
+    setFocusable(true);
     addMouseMotionListener(leAdapteurDeMouse);
     addMouseListener(leAdapteurDeMouse);
-    addKeyListener(new KeyListener() {
-
-      @Override
-      public void keyTyped(KeyEvent e) {
-        System.out.println(e.getKeyChar());
-      }
-
-      @Override
-      public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-
-      }
-
+    addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
+        final Direction direction = keyCodeDirectionMap.get(e.getKeyCode());
 
+        if (direction != null) {
+          System.out.println(direction);
+        }
+      }
+    });
+    addFocusListener(new FocusListener() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        repaint();
+      }
+
+      @Override
+      public void focusGained(FocusEvent e) {
+        repaint();
       }
     });
   }
@@ -58,7 +77,7 @@ public class InteractiveFieldComponent extends FieldComponent {
       selectedPiece = selectionCandidate;
       repaint();
     }
-    requestFocus();
+    grabFocus();
   }
 
   void mouseOver(Point mousePos) {
@@ -93,6 +112,7 @@ public class InteractiveFieldComponent extends FieldComponent {
     if ((selectionCandidate != null) && (selectionCandidate != selectedPiece)) {
       drawFrame(g, selectionCandidate, 2);
     }
+    System.out.println(isFocusOwner());
   }
 
   private void drawFrame(Graphics g, Piece selectedPiece, int lineWidth) {
