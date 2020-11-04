@@ -55,7 +55,9 @@ public class InteractiveFieldComponent extends FieldComponent {
         final Direction direction = keyCodeDirectionMap.get(e.getKeyCode());
 
         if (direction != null) {
-          System.out.println(direction);
+          if (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK) {
+            System.out.println("Crtl+" + direction);
+          }
         }
       }
     });
