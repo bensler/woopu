@@ -9,7 +9,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.bensler.woopu.model.Direction;
 import com.bensler.woopu.model.Field;
@@ -55,8 +57,16 @@ public class InteractiveFieldComponent extends FieldComponent {
         final Direction direction = keyCodeDirectionMap.get(e.getKeyCode());
 
         if (direction != null) {
-          if (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK) {
-            System.out.println("Crtl+" + direction);
+          if ((e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK) && (selectedPiece != null)) {
+            if (field.arePositionsFree(direction.getNewlyOccupiedPositions(selectedPiece))) {
+              final List<Piece> newPieces = field.pieces().filter(piece -> (piece != selectedPiece)).collect(Collectors.toList());
+              final Point newPosition = direction.getNewPosition(selectedPiece);
+              final Piece newPiece = new Piece(selectedPiece.type, newPosition.x, newPosition.y);
+
+              newPieces.add(newPiece);
+              setField(new Field(newPieces));
+              selectedPiece = newPiece;
+            }
           }
         }
       }
@@ -100,9 +110,9 @@ public class InteractiveFieldComponent extends FieldComponent {
 
   @Override
   public void setField(Field newField) {
-    super.setField(newField);
     selectedPiece = null;
     selectionCandidate = null;
+    super.setField(newField);
   }
 
   @Override

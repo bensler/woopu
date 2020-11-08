@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Direction {
-  NORTH {
+  NORTH (0, -1) {
     @Override
     public List<Point> getNewlyOccupiedPositions(Piece piece) {
       final int y = piece.getTopY() - 1;
@@ -17,7 +17,7 @@ public enum Direction {
       return result;
     }
   },
-  EAST {
+  EAST (1, 0) {
     @Override
     public List<Point> getNewlyOccupiedPositions(Piece piece) {
       final int x = piece.getRightX() + 1;
@@ -29,7 +29,7 @@ public enum Direction {
       return result;
     }
   },
-  SOUTH {
+  SOUTH (0, 1) {
     @Override
     public List<Point> getNewlyOccupiedPositions(Piece piece) {
       final int y = piece.getBottomY() + 1;
@@ -41,7 +41,7 @@ public enum Direction {
       return result;
     }
   },
-  WEST {
+  WEST (-1, 0) {
     @Override
     public List<Point> getNewlyOccupiedPositions(Piece piece) {
       final int x = piece.getLeftX() - 1;
@@ -50,10 +50,23 @@ public enum Direction {
       for (int i = 0; i < piece.getHeight(); i++) {
         result.add(new Point(x, piece.getTopY() + i));
       }
+
       return result;
     }
   };
 
+  private final int deltaX;
+  private final int deltaY;
+
+  Direction(int aDeltaX, int aDeltaY) {
+    deltaX = aDeltaX;
+    deltaY = aDeltaY;
+  }
+
   public abstract List<Point> getNewlyOccupiedPositions(Piece piece);
+
+  public Point getNewPosition(Piece piece) {
+    return new Point(piece.getLeftX() + deltaX, piece.getTopY() + deltaY);
+  }
 
 }

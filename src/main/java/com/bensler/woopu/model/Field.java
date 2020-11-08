@@ -1,6 +1,8 @@
 package com.bensler.woopu.model;
 
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,6 +20,10 @@ public class Field {
   private final List<Piece> pieces;
 
   public Field(Piece... newPieces) {
+    this(Arrays.asList(newPieces));
+  }
+
+  public Field(List<Piece> newPieces) {
     pieces = new ArrayList<>();
     for (Piece newPiece : newPieces) {
       if (
@@ -40,7 +46,7 @@ public class Field {
 
   /** copy constructor */
   public Field(Field field) {
-    this(field.pieces.toArray(new Piece[field.pieces.size()]));
+    this(field.pieces);
   }
 
   public Stream<Piece> pieces() {
@@ -49,6 +55,32 @@ public class Field {
 
   public Piece pieceAt(int x, int y) {
     return pieces().filter(piece -> piece.covers(x, y)).findFirst().orElse(null);
+  }
+
+  public boolean arePositionsFree(List<Point> positions) {
+    for (Point position : positions) {
+      if (!isPositionFree(position)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public boolean isPositionFree(Point position) {
+    final boolean inField = (
+      (position.x >= 0) && (position.x < WIDTH)
+      && (position.y >= 0) && (position.y < HEIGHT)
+    );
+
+    if (!inField) {
+      return false;
+    }
+    for (Piece piece : pieces) {
+      if (piece.covers(position.x, position.y)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }
