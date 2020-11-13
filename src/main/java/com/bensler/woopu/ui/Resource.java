@@ -1,4 +1,4 @@
-package com.bensler.woopu.util;
+package com.bensler.woopu.ui;
 
 import java.awt.Graphics;
 import java.util.function.Consumer;

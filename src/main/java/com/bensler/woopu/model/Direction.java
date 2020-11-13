@@ -65,6 +65,14 @@ public enum Direction {
 
   public abstract List<Point> getNewlyOccupiedPositions(Piece piece);
 
+  public int getDeltaX() {
+    return deltaX;
+  }
+
+  public int getDeltaY() {
+    return deltaY;
+  }
+
   public Point getNewPosition(Piece piece) {
     return new Point(piece.getLeftX() + deltaX, piece.getTopY() + deltaY);
   }

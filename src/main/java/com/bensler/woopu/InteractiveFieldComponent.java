@@ -1,8 +1,12 @@
 package com.bensler.woopu;
 
+import static com.bensler.woopu.ui.anim.AnimationTask.FRAME_RATE;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -11,11 +15,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 import java.util.stream.Collectors;
 
 import com.bensler.woopu.model.Direction;
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.model.Piece;
+import com.bensler.woopu.ui.anim.AnimationProgress;
+import com.bensler.woopu.ui.anim.AnimationTask;
 
 public class InteractiveFieldComponent extends FieldComponent {
 
@@ -26,11 +33,17 @@ public class InteractiveFieldComponent extends FieldComponent {
     KeyEvent.VK_LEFT,  Direction.WEST
   );
 
+  private   final Timer timer;
+
+  private AnimationProgress<MovingPiece> animation;
+
   private Piece selectedPiece;
   private Piece selectionCandidate;
 
   public InteractiveFieldComponent(float gridScaleFactor, ImageSource anImgSrc, Field aField) {
     super(gridScaleFactor, anImgSrc, aField);
+    timer = new Timer();
+
     final MouseAdapter leAdapteurDeMouse = new MouseAdapter() {
       @Override
       public void mouseMoved(MouseEvent evt) {
@@ -46,6 +59,7 @@ public class InteractiveFieldComponent extends FieldComponent {
       public void mouseClicked(MouseEvent evt) {
         selectCandidate();
       }
+
     };
 
     setFocusable(true);
@@ -56,20 +70,16 @@ public class InteractiveFieldComponent extends FieldComponent {
       public void keyPressed(KeyEvent e) {
         final Direction direction = keyCodeDirectionMap.get(e.getKeyCode());
 
-        if (direction != null) {
-          if ((e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK) && (selectedPiece != null)) {
-            if (field.arePositionsFree(direction.getNewlyOccupiedPositions(selectedPiece))) {
-              final List<Piece> newPieces = field.pieces().filter(piece -> (piece != selectedPiece)).collect(Collectors.toList());
-              final Point newPosition = direction.getNewPosition(selectedPiece);
-              final Piece newPiece = new Piece(selectedPiece.type, newPosition.x, newPosition.y);
-
-              newPieces.add(newPiece);
-              setField(new Field(newPieces));
-              selectedPiece = newPiece;
-            }
-          }
+        if (
+          (direction != null)
+          && (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK)
+          && (selectedPiece != null)
+          && field.arePositionsFree(direction.getNewlyOccupiedPositions(selectedPiece))
+        ) {
+          movePiece(selectedPiece, direction);
         }
       }
+
     });
     addFocusListener(new FocusListener() {
       @Override
@@ -81,7 +91,29 @@ public class InteractiveFieldComponent extends FieldComponent {
       public void focusGained(FocusEvent e) {
         repaint();
       }
+
     });
+  }
+
+  void movePiece(Piece pieceToMove, Direction direction) {
+    final List<Piece> newPieces = field.pieces().filter(piece -> (piece != pieceToMove)).collect(Collectors.toList());
+    final Point newPosition = direction.getNewPosition(pieceToMove);
+    final Piece newPiece = new Piece(pieceToMove.type, newPosition.x, newPosition.y);
+    final AnimationTask task;
+
+    newPieces.add(newPiece);
+    task = new AnimationTask(new AnimationProgress<>(
+      AnimationProgress.ATAN_TRANSFORMER,
+      new MovingPiece(this, pieceToMove, direction),
+      thisAnimation -> {animation = thisAnimation;},
+      thisAnimation -> {paintImmediately(getBounds());},
+      thisAnimation -> {
+        animation = null;
+        setField(new Field(newPieces));
+        selectedPiece = newPiece;
+      }
+    ), 500, FRAME_RATE);
+    timer.scheduleAtFixedRate(task, 0, task.getMsPerFrame());
   }
 
   void selectCandidate() {
@@ -118,13 +150,16 @@ public class InteractiveFieldComponent extends FieldComponent {
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    if (selectedPiece != null) {
-      drawFrame(g, selectedPiece, 4);
+    if (animation != null) {
+      animation.getContext().paint(this, g, animation.getProgressRatio());
+    } else {
+      if (selectedPiece != null) {
+        drawFrame(g, selectedPiece, 4);
+      }
+      if ((selectionCandidate != null) && (selectionCandidate != selectedPiece)) {
+        drawFrame(g, selectionCandidate, 2);
+      }
     }
-    if ((selectionCandidate != null) && (selectionCandidate != selectedPiece)) {
-      drawFrame(g, selectionCandidate, 2);
-    }
-    System.out.println(isFocusOwner());
   }
 
   private void drawFrame(Graphics g, Piece selectedPiece, int lineWidth) {
@@ -137,6 +172,51 @@ public class InteractiveFieldComponent extends FieldComponent {
     for (int i = 0; i < lineWidth; i++) {
       g.drawRoundRect(x + i, y + i, width - (2 * i), height - (2 * i), 20 - (2 * i), 20 - (2 * i));
     }
+  }
+
+  static class MovingPiece {
+
+    private final Piece movingPiece;
+    private final Rectangle clippingRect;
+    private final Direction direction;
+
+    public MovingPiece(InteractiveFieldComponent fieldComp, Piece aMovingPiece, Direction aDirection) {
+      final int gridWidth = fieldComp.gridWidth;
+      final Rectangle clipGrid;
+
+      movingPiece = aMovingPiece;
+      direction = aDirection;
+      clipGrid = new Rectangle(
+        Math.min(movingPiece.getLeftX(), movingPiece.getLeftX() + direction.getDeltaX()),
+        Math.min(movingPiece.getTopY(), movingPiece.getTopY() + direction.getDeltaY()),
+        movingPiece.getWidth() + Math.abs(direction.getDeltaX()),
+        movingPiece.getHeight() + Math.abs(direction.getDeltaY())
+      );
+      clippingRect = new Rectangle(
+        fieldComp.frameWidth + (gridWidth * clipGrid.x),
+        fieldComp.frameWidth + (gridWidth * clipGrid.y),
+        gridWidth * clipGrid.width,
+        gridWidth * clipGrid.height
+      );
+    }
+
+    void paint(InteractiveFieldComponent fieldComp, Graphics g, float progressRatio) {
+      final int gridWidth = fieldComp.gridWidth;
+      final Shape oldClip = g.getClip();
+
+      try {
+        g.setClip(clippingRect);
+        fieldComp.paintBackground(g);
+        fieldComp.paintPiece(
+          g, movingPiece.type,
+          fieldComp.frameWidth + (gridWidth * movingPiece.getLeftX()) + Math.round(gridWidth * progressRatio * direction.getDeltaX()),
+          fieldComp.frameWidth + (gridWidth * movingPiece.getTopY()) + Math.round(gridWidth * progressRatio * direction.getDeltaY())
+        );
+      } finally {
+        g.setClip(oldClip);
+      }
+    }
+
   }
 
 }

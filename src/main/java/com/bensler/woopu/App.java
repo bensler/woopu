@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.bensler.woopu.model.Field;
-import com.bensler.woopu.util.ComponentIconAdapter;
+import com.bensler.woopu.ui.ComponentIconAdapter;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.looks.LookUtils;

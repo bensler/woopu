@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.model.PieceType;
+import com.bensler.woopu.ui.ImageResource;
 
 /**
  * Provides loaded image resources as static fields. Image sizes are checked on loading.

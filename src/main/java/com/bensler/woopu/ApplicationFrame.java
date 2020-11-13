@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -27,9 +26,9 @@ public class ApplicationFrame extends JFrame {
     setIconImage(iconImg);
     getContentPane().add(frameContent, BorderLayout.CENTER);
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    setVisible(true);
     pack();
-    centerOnScreen();
+    setLocationRelativeTo(null); // center on screen
+    setVisible(true);
     limitSize();
   }
 
@@ -52,20 +51,6 @@ public class ApplicationFrame extends JFrame {
       }
 
     });
-  }
-
-  public void centerOnScreen() {
-    final Rectangle screenBounds = getGraphicsConfiguration().getBounds();
-    final Rectangle windowBounds = getBounds();
-
-    final int xPos = ((screenBounds.width - windowBounds.width) / 2);
-    final int yPos = ((screenBounds.height - windowBounds.height) / 2);
-
-    setLocation(Math.max(0, xPos), Math.max(0, yPos));
-    setSize(
-      Math.min(screenBounds.width, windowBounds.width),
-      Math.min(screenBounds.height, windowBounds.height)
-    );
   }
 
 }

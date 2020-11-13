@@ -1,4 +1,4 @@
-package com.bensler.woopu;
+package com.bensler.woopu.ui;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
