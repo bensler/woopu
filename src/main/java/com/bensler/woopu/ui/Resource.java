@@ -1,6 +1,5 @@
 package com.bensler.woopu.ui;
 
-import java.awt.Graphics;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -8,7 +7,7 @@ import java.util.function.Supplier;
  * A Resource implementing {@link AutoCloseable} to make the try-with-resource
  * idiom useable with any other class (not implementing {@link AutoCloseable}).
  * <p>
- * Example: a {@link Graphics} object needs to be disposed after use. Usually
+ * Example: a {@link java.awt.Graphics Graphics} object needs to be disposed after use. Usually
  * this would be achieved like that:
  * <pre>
  * final Graphics subG = g.create();
