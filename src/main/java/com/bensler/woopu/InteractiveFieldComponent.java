@@ -9,10 +9,8 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -26,7 +24,7 @@ import com.bensler.woopu.ui.anim.AnimationTask;
 
 public class InteractiveFieldComponent extends FieldComponent {
 
-  private final static Map<Integer, Direction> keyCodeDirectionMap = Map.of(
+  final static Map<Integer, Direction> keyCodeDirectionMap = Map.of(
     KeyEvent.VK_UP,    Direction.NORTH,
     KeyEvent.VK_RIGHT, Direction.EAST,
     KeyEvent.VK_DOWN,  Direction.SOUTH,
@@ -44,43 +42,12 @@ public class InteractiveFieldComponent extends FieldComponent {
     super(gridScaleFactor, anImgSrc, aField);
     timer = new Timer();
 
-    final MouseAdapter leAdapteurDeMouse = new MouseAdapter() {
-      @Override
-      public void mouseMoved(MouseEvent evt) {
-        mouseOver(evt.getPoint());
-      }
-
-      @Override
-      public void mouseExited(MouseEvent e) {
-        mouseOver(new Point(-1, -1));
-      }
-
-      @Override
-      public void mouseClicked(MouseEvent evt) {
-        selectCandidate();
-      }
-
-    };
+    final MouseAdapter leAdapteurDeMouse = new MouseEventSource(this);
 
     setFocusable(true);
     addMouseMotionListener(leAdapteurDeMouse);
     addMouseListener(leAdapteurDeMouse);
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(KeyEvent e) {
-        final Direction direction = keyCodeDirectionMap.get(e.getKeyCode());
-
-        if (
-          (direction != null)
-          && (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK)
-          && (selectedPiece != null)
-          && field.arePositionsFree(direction.getNewlyOccupiedPositions(selectedPiece))
-        ) {
-          movePiece(selectedPiece, direction);
-        }
-      }
-
-    });
+    addKeyListener(new KeyEventSource(this));
     addFocusListener(new FocusListener() {
       @Override
       public void focusLost(FocusEvent e) {
@@ -93,6 +60,15 @@ public class InteractiveFieldComponent extends FieldComponent {
       }
 
     });
+  }
+
+  void moveSelectedPiece(Direction direction) {
+   if (
+     (selectedPiece != null)
+      && field.arePositionsFree(direction.getNewlyOccupiedPositions(selectedPiece))
+    ) {
+      movePiece(selectedPiece, direction);
+    }
   }
 
   void movePiece(Piece pieceToMove, Direction direction) {
@@ -176,6 +152,10 @@ public class InteractiveFieldComponent extends FieldComponent {
     for (int i = 0; i < lineWidth; i++) {
       g.drawRoundRect(x + i, y + i, width - (2 * i), height - (2 * i), 20 - (2 * i), 20 - (2 * i));
     }
+  }
+
+  public boolean isInAnimation() {
+    return (animation != null);
   }
 
   static class MovingPiece {
