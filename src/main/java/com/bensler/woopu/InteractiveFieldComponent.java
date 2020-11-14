@@ -152,22 +152,26 @@ public class InteractiveFieldComponent extends FieldComponent {
     super.paintComponent(g);
     if (animation != null) {
       animation.getContext().paint(this, g, animation.getProgressRatio());
-    } else {
-      if (selectedPiece != null) {
-        drawFrame(g, selectedPiece, 4);
-      }
-      if ((selectionCandidate != null) && (selectionCandidate != selectedPiece)) {
-        drawFrame(g, selectionCandidate, 2);
-      }
     }
   }
 
-  private void drawFrame(Graphics g, Piece selectedPiece, int lineWidth) {
-    final int x = frameWidth + (gridWidth * selectedPiece.getLeftX() + 2);
-    final int y = frameWidth + (gridWidth * selectedPiece.getTopY()) + 2;
+  @Override
+  protected void paintPiece(Graphics g, Piece piece, int x, int y) {
+    super.paintPiece(g, piece, x, y);
+    if (selectedPiece == piece) {
+      drawFrame(g, selectedPiece, x, y, 4);
+    }
+    if ((selectionCandidate == piece) && (selectionCandidate != selectedPiece)) {
+      drawFrame(g, selectionCandidate, x, y, 2);
+    }
+  }
+
+  private void drawFrame(Graphics g, Piece selectedPiece, int x, int y, int lineWidth) {
     final int width = (gridWidth * selectedPiece.getWidth()) - 4;
     final int height = (gridWidth * selectedPiece.getHeight()) - 4;
 
+    x = x + 2;
+    y = y + 2;
     g.setColor(Color.RED);
     for (int i = 0; i < lineWidth; i++) {
       g.drawRoundRect(x + i, y + i, width - (2 * i), height - (2 * i), 20 - (2 * i), 20 - (2 * i));
@@ -208,7 +212,7 @@ public class InteractiveFieldComponent extends FieldComponent {
         g.setClip(clippingRect);
         fieldComp.paintBackground(g);
         fieldComp.paintPiece(
-          g, movingPiece.type,
+          g, movingPiece,
           fieldComp.frameWidth + (gridWidth * movingPiece.getLeftX()) + Math.round(gridWidth * progressRatio * direction.getDeltaX()),
           fieldComp.frameWidth + (gridWidth * movingPiece.getTopY()) + Math.round(gridWidth * progressRatio * direction.getDeltaY())
         );

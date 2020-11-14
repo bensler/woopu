@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import com.bensler.woopu.model.Field;
-import com.bensler.woopu.model.PieceType;
+import com.bensler.woopu.model.Piece;
 
 /**
  * {@link JComponent} displaying a {@link Field} on screen.
@@ -44,7 +44,7 @@ public class FieldComponent extends JComponent {
     super.paintComponent(g);
     paintBackground(g);
     field.pieces().forEach(piece -> paintPiece(g,
-      piece.type,
+      piece,
       frameWidth + (gridWidth * piece.getLeftX()),
       frameWidth + (gridWidth * piece.getTopY())
     ));
@@ -54,8 +54,8 @@ public class FieldComponent extends JComponent {
     backgroundImg.paintIcon(this, g, 0, 0);
   }
 
-  protected void paintPiece(Graphics g, PieceType type, int x, int y) {
-    imgSrc.getPieceImageIcon(type).paintIcon(
+  protected void paintPiece(Graphics g, Piece piece, int x, int y) {
+    imgSrc.getPieceImageIcon(piece.type).paintIcon(
       this, g, x, y
     );
   }
