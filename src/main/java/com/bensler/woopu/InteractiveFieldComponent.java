@@ -16,9 +16,12 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.stream.Collectors;
 
+import javax.swing.event.AncestorEvent;
+
 import com.bensler.woopu.model.Direction;
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.model.Piece;
+import com.bensler.woopu.ui.AncestorAdapter;
 import com.bensler.woopu.ui.anim.AnimationProgress;
 import com.bensler.woopu.ui.anim.AnimationTask;
 
@@ -42,6 +45,13 @@ public class InteractiveFieldComponent extends FieldComponent {
     super(gridScaleFactor, anImgSrc, aField);
     timer = new Timer();
 
+    addAncestorListener(new AncestorAdapter() {
+      @Override
+      public void ancestorRemoved(AncestorEvent event) {
+        timer.cancel();
+      }
+
+    });
     final MouseAdapter leAdapteurDeMouse = new MouseEventSource(this);
 
     setFocusable(true);
