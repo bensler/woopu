@@ -36,7 +36,7 @@ public class InteractiveFieldComponent extends FieldComponent {
   private AnimationProgress<MovingPiece> animation;
 
   private Piece selectedPiece;
-  private Piece selectionCandidate;
+  private Point selection;
 
   public InteractiveFieldComponent(float gridScaleFactor, ImageSource anImgSrc, Field aField) {
     super(gridScaleFactor, anImgSrc, aField);
@@ -71,6 +71,17 @@ public class InteractiveFieldComponent extends FieldComponent {
     }
   }
 
+  public void moveSelection(Direction direction) {
+    if (selection != null) {
+      final Point newSelection = direction.getNewPosition(selection);
+
+      if (field.isInField(newSelection)) {
+        selectedPiece = field.pieceAt(selection = newSelection);
+        repaint();
+      }
+    }
+  }
+
   void movePiece(Piece pieceToMove, Direction direction) {
     final List<Piece> newPieces = field.pieces().filter(piece -> (piece != pieceToMove)).collect(Collectors.toList());
     final Point newPosition = direction.getNewPosition(pieceToMove);
@@ -81,76 +92,86 @@ public class InteractiveFieldComponent extends FieldComponent {
     task = new AnimationTask(new AnimationProgress<>(
       AnimationProgress.ATAN_TRANSFORMER,
       new MovingPiece(this, pieceToMove, direction),
-      thisAnimation -> {animation = thisAnimation;},
-      thisAnimation -> {paintImmediately(getBounds());},
-      thisAnimation -> {
-        animation = null;
-        setField(new Field(newPieces));
-        selectedPiece = newPiece;
-      }
+      thisAnimation -> animation = thisAnimation,
+      thisAnimation -> paintImmediately(getBounds()),
+      thisAnimation -> animationFinished(newPieces, newPiece, direction.getNewPosition(selection))
     ), 500, FRAME_RATE);
     timer.scheduleAtFixedRate(task, 0, task.getMsPerFrame());
   }
 
-  void selectCandidate() {
-    if (selectedPiece != selectionCandidate) {
-      selectedPiece = selectionCandidate;
+  void animationFinished(List<Piece> newPieces, Piece newPiece, Point newSelection) {
+    animation = null;
+    setField(new Field(newPieces));
+    selectedPiece = newPiece;
+    selection = newSelection;
+  }
+
+  void mouseClicked(Point mousePos) {
+    final Point selectionCandidate = new Point(
+      ((mousePos.x - frameWidth) / gridSize),
+      ((mousePos.y - frameWidth) / gridSize)
+    );
+
+    if (field.isInField(selectionCandidate)) {
+      final Piece piece = field.pieceAt(selectionCandidate);
+
+      selection = selectionCandidate;
+      if (piece != null) {
+        selectedPiece = piece;
+      }
       repaint();
     }
     grabFocus();
   }
 
-  void mouseOver(Point mousePos) {
-    final Point mousePosLocal = new Point(mousePos.x - frameWidth, mousePos.y - frameWidth);
-    final int x = mousePosLocal.x / gridWidth;
-    final int y = mousePosLocal.y / gridWidth;
-    final Piece piece = (
-      ((mousePosLocal.x >= 0) && (mousePosLocal.y >= 0))
-      ? field.pieceAt(x, y) : null
-    );
-
-    if (piece != selectionCandidate) {
-      selectionCandidate = piece;
-      repaint();
-    }
-  }
-
-
   @Override
   public void setField(Field newField) {
     selectedPiece = null;
-    selectionCandidate = null;
+    selection = null;
     super.setField(newField);
   }
 
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    if (animation != null) {
+    if (isInAnimation()) {
       animation.getContext().paint(this, g, animation.getProgressRatio());
+    } else {
+      drawSelection(g, 0, 0);
+    }
+  }
+
+  private void drawSelection(Graphics g, int deltaXPix, int deltaYPix) {
+    if (selection != null) {
+      final Rectangle pixBounds = getGridPixBounds(selection.x, selection.y, 1, 1);
+
+      pixBounds.x += deltaXPix;
+      pixBounds.y += deltaYPix;
+      drawFrame(g, pixBounds, 8, 2);
     }
   }
 
   @Override
-  protected void paintPiece(Graphics g, Piece piece, int x, int y) {
-    super.paintPiece(g, piece, x, y);
+  protected Rectangle paintPiece(Graphics g, Piece piece, int deltaXPix, int deltaYPix) {
+    final Rectangle pixBounds = super.paintPiece(g, piece, deltaXPix, deltaYPix);
+
     if (selectedPiece == piece) {
-      drawFrame(g, selectedPiece, x, y, 4);
+      drawFrame(g, pixBounds, 2, 4);
     }
-    if ((selectionCandidate == piece) && (selectionCandidate != selectedPiece)) {
-      drawFrame(g, selectionCandidate, x, y, 2);
-    }
+    return pixBounds;
   }
 
-  private void drawFrame(Graphics g, Piece selectedPiece, int x, int y, int lineWidth) {
-    final int width = (gridWidth * selectedPiece.getWidth()) - 4;
-    final int height = (gridWidth * selectedPiece.getHeight()) - 4;
-
-    x = x + 2;
-    y = y + 2;
+  private void drawFrame(Graphics g, Rectangle pixRect, int inset, int lineWidth) {
+    pixRect.x += inset;
+    pixRect.y += inset;
+    pixRect.width -= (2 * inset);
+    pixRect.height -= (2 * inset);
     g.setColor(Color.RED);
     for (int i = 0; i < lineWidth; i++) {
-      g.drawRoundRect(x + i, y + i, width - (2 * i), height - (2 * i), 20 - (2 * i), 20 - (2 * i));
+      g.drawRoundRect(
+        pixRect.x + i, pixRect.y + i, pixRect.width - (2 * i), pixRect.height - (2 * i),
+        20 - (2 * i), 20 - (2 * i)
+      );
     }
   }
 
@@ -165,7 +186,7 @@ public class InteractiveFieldComponent extends FieldComponent {
     private final Direction direction;
 
     public MovingPiece(InteractiveFieldComponent fieldComp, Piece aMovingPiece, Direction aDirection) {
-      final int gridWidth = fieldComp.gridWidth;
+      final int gridWidth = fieldComp.gridSize;
       final Rectangle clipGrid;
 
       movingPiece = aMovingPiece;
@@ -185,17 +206,16 @@ public class InteractiveFieldComponent extends FieldComponent {
     }
 
     void paint(InteractiveFieldComponent fieldComp, Graphics g, float progressRatio) {
-      final int gridWidth = fieldComp.gridWidth;
+      final int gridWidth = fieldComp.gridSize;
       final Shape oldClip = g.getClip();
+      final int deltaXPix = Math.round(gridWidth * progressRatio * direction.getDeltaX());
+      final int deltaYPix = Math.round(gridWidth * progressRatio * direction.getDeltaY());
 
       try {
         g.setClip(clippingRect);
         fieldComp.paintBackground(g);
-        fieldComp.paintPiece(
-          g, movingPiece,
-          fieldComp.frameWidth + (gridWidth * movingPiece.getLeftX()) + Math.round(gridWidth * progressRatio * direction.getDeltaX()),
-          fieldComp.frameWidth + (gridWidth * movingPiece.getTopY()) + Math.round(gridWidth * progressRatio * direction.getDeltaY())
-        );
+        fieldComp.paintPiece(g, movingPiece, deltaXPix, deltaYPix);
+        fieldComp.drawSelection(g, deltaXPix, deltaYPix);
       } finally {
         g.setClip(oldClip);
       }

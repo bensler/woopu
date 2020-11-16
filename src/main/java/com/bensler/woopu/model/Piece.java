@@ -1,5 +1,7 @@
 package com.bensler.woopu.model;
 
+import java.awt.Point;
+
 public class Piece {
 
   public final PieceType type;
@@ -34,6 +36,10 @@ public class Piece {
 
   public int getBottomY() {
     return y + type.height - 1;
+  }
+
+  public Point getPosition() {
+    return new Point(x, y);
   }
 
   @Override

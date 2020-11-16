@@ -44,6 +44,13 @@ public class Field {
     }
   }
 
+  public boolean isInField(Point position) {
+    return (
+      (position.x >= 0) && (position.x < WIDTH)
+      && (position.y >= 0) && (position.y < HEIGHT)
+    );
+  }
+
   /** copy constructor */
   public Field(Field field) {
     this(field.pieces);
@@ -53,8 +60,10 @@ public class Field {
     return pieces.stream();
   }
 
-  public Piece pieceAt(int x, int y) {
-    return pieces().filter(piece -> piece.covers(x, y)).findFirst().orElse(null);
+  public Piece pieceAt(Point position) {
+    return pieces().filter(
+      piece -> piece.covers(position.x, position.y)
+    ).findFirst().orElse(null);
   }
 
   public boolean arePositionsFree(List<Point> positions) {

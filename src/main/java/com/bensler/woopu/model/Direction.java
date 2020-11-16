@@ -74,7 +74,11 @@ public enum Direction {
   }
 
   public Point getNewPosition(Piece piece) {
-    return new Point(piece.getLeftX() + deltaX, piece.getTopY() + deltaY);
+    return getNewPosition(piece.getPosition());
+  }
+
+  public Point getNewPosition(Point position) {
+    return new Point(position.x + deltaX, position.y  + deltaY);
   }
 
 }

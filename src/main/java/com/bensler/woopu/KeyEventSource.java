@@ -15,14 +15,16 @@ public class KeyEventSource extends KeyAdapter {
 
   @Override
   public void keyPressed(KeyEvent e) {
-    final Direction direction = InteractiveFieldComponent.keyCodeDirectionMap.get(e.getKeyCode());
+    if (!fieldComponent.isInAnimation()) {
+      final Direction direction = InteractiveFieldComponent.keyCodeDirectionMap.get(e.getKeyCode());
 
-    if (
-      (direction != null)
-      && (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK)
-      && (!fieldComponent.isInAnimation())
-    ) {
-      fieldComponent.moveSelectedPiece(direction);
+      if (direction != null) {
+        if (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK) {
+          fieldComponent.moveSelectedPiece(direction);
+        } else {
+          fieldComponent.moveSelection(direction);
+        }
+      }
     }
   }
 
