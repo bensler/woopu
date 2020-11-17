@@ -9,7 +9,9 @@ import javax.swing.ImageIcon;
 import com.bensler.woopu.model.PieceType;
 
 /**
- * TODO
+ * Keeps an {@link Image} and an {@link ImageIcon} for each {@link PieceType} and background.
+ * <p>
+ * ImageIcons are created lazily from Images and are cached as they seem to be not exactly lightweight.
  */
 public class FieldImageSource {
 

@@ -55,6 +55,7 @@ public class AnimationProgress<CONTEXT> {
   private final Consumer<AnimationProgress<CONTEXT>> painter;
   private final Consumer<AnimationProgress<CONTEXT>> doneListener;
 
+  private AnimationTask task;
   private AnimationState state;
   long firstNanos;
   long maxNanoDiff;
@@ -71,6 +72,14 @@ public class AnimationProgress<CONTEXT> {
     startListener = aStartListener;
     painter = aPainter;
     doneListener = aDoneListener;
+  }
+
+  void setTask(AnimationTask animationTask) {
+    task = animationTask;
+  }
+
+  public void finishImmediately() {
+    task.finishImmediately();
   }
 
   void beforePaint(boolean firstRun, boolean lastRun) {

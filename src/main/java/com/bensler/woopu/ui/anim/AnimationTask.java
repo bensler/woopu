@@ -13,22 +13,29 @@ public class AnimationTask extends TimerTask {
   private final int maxFrameCount;
   private final int msPerFrame;
 
+  private boolean finishImmediately;
   private int frameCount;
 
   public AnimationTask(AnimationProgress<?> anAnimationState, long durationMillies, int frameRate) {
     msPerFrame = Math.round(1000.0f / frameRate);
     maxFrameCount = Math.round(durationMillies / (float)msPerFrame);
     (progress = anAnimationState).setDurationNanos((maxFrameCount * msPerFrame) * 1_000_000);
+    progress.setTask(this);
+    finishImmediately = false;
   }
 
   public int getMsPerFrame() {
     return msPerFrame;
   }
 
+  void finishImmediately() {
+    finishImmediately = true;
+  }
+
   @Override
   public void run() {
     final boolean firstRun = (frameCount == 0);
-    final boolean lastRun = (frameCount >= maxFrameCount);
+    final boolean lastRun = (finishImmediately || (frameCount >= maxFrameCount));
 
     progress.beforePaint(firstRun, lastRun);
     try {
@@ -39,7 +46,7 @@ public class AnimationTask extends TimerTask {
       ite.getCause().printStackTrace();
     }
     progress.afterPaint(firstRun, lastRun);
-    if (lastRun) {
+    if (lastRun || finishImmediately) {
       cancel();
     }
     frameCount++;

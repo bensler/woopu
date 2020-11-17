@@ -144,7 +144,7 @@ public class InteractiveFieldComponent extends FieldComponent {
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    if (isInAnimation()) {
+    if (animation != null) {
       animation.getContext().paint(this, g, animation.getProgressRatio());
     } else {
       drawSelection(g, 0, 0);
@@ -185,8 +185,10 @@ public class InteractiveFieldComponent extends FieldComponent {
     }
   }
 
-  public boolean isInAnimation() {
-    return (animation != null);
+  public void finishAnimation() {
+    if (animation != null) {
+      animation.finishImmediately();
+    }
   }
 
   static class MovingPiece {

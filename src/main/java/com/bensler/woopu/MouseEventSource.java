@@ -13,9 +13,8 @@ public class MouseEventSource extends MouseAdapter {
 
   @Override
   public void mouseClicked(MouseEvent evt) {
-    if (!fieldComponent.isInAnimation()) {
-      fieldComponent.mouseClicked(evt.getPoint());
-    }
+    fieldComponent.finishAnimation();
+    fieldComponent.mouseClicked(evt.getPoint());
   }
 
 }
