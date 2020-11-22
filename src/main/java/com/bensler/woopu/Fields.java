@@ -5,6 +5,8 @@ import static com.bensler.woopu.model.PieceType.RED_HORIZONTAL;
 import static com.bensler.woopu.model.PieceType.RED_VERTICAL;
 import static com.bensler.woopu.model.PieceType.YELLOW;
 
+import java.awt.Point;
+
 import com.bensler.woopu.model.Field;
 import com.bensler.woopu.model.Piece;
 
@@ -13,109 +15,109 @@ import com.bensler.woopu.model.Piece;
  */
 public enum Fields {
 
-  A(new Field(
-    new Piece(RED_VERTICAL,  0, 0),
-    new Piece(RED_VERTICAL,  1, 0),
-    new Piece(RED_VERTICAL,  3, 0),
-    new Piece(RED_VERTICAL,  0, 2),
-    new Piece(BLUE,          1, 2),
-    new Piece(RED_VERTICAL,  3, 2),
-    new Piece(YELLOW,        0, 4),
-    new Piece(YELLOW,        1, 4),
-    new Piece(YELLOW,        2, 4),
-    new Piece(YELLOW,        3, 4)
-  )),
+  A(new Field()
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 0))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(1, 0))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 0))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 2))
+    .addPiece(new Piece(BLUE),           new Point(1, 2))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 2))
+    .addPiece(new Piece(YELLOW),         new Point(0, 4))
+    .addPiece(new Piece(YELLOW),         new Point(1, 4))
+    .addPiece(new Piece(YELLOW),         new Point(2, 4))
+    .addPiece(new Piece(YELLOW),         new Point(3, 4))
+  ),
 
-  B(new Field(
-    new Piece(RED_HORIZONTAL, 1, 0),
-    new Piece(RED_HORIZONTAL, 0, 1),
-    new Piece(RED_HORIZONTAL, 2, 1),
-    new Piece(RED_VERTICAL,   0, 2),
-    new Piece(BLUE,           1, 2),
-    new Piece(RED_VERTICAL,   3, 2),
-    new Piece(YELLOW,         0, 4),
-    new Piece(YELLOW,         1, 4),
-    new Piece(YELLOW,         2, 4),
-    new Piece(YELLOW,         3, 4)
-  )),
+  B(new Field()
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 0))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 1))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 1))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 2))
+    .addPiece(new Piece(BLUE),           new Point(1, 2))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 2))
+    .addPiece(new Piece(YELLOW),         new Point(0, 4))
+    .addPiece(new Piece(YELLOW),         new Point(1, 4))
+    .addPiece(new Piece(YELLOW),         new Point(2, 4))
+    .addPiece(new Piece(YELLOW),         new Point(3, 4))
+  ),
 
-  C(new Field(
-    new Piece(YELLOW,         0, 0),
-    new Piece(YELLOW,         0, 1),
-    new Piece(BLUE,           1, 0),
-    new Piece(YELLOW,         3, 0),
-    new Piece(YELLOW,         3, 1),
-    new Piece(RED_HORIZONTAL, 1, 2),
-    new Piece(RED_HORIZONTAL, 0, 3),
-    new Piece(RED_HORIZONTAL, 2, 3),
-    new Piece(RED_HORIZONTAL, 0, 4),
-    new Piece(RED_HORIZONTAL, 2, 4)
-  )),
+  C(new Field()
+    .addPiece(new Piece(YELLOW),         new Point(0, 0))
+    .addPiece(new Piece(YELLOW),         new Point(0, 1))
+    .addPiece(new Piece(BLUE),           new Point(1, 0))
+    .addPiece(new Piece(YELLOW),         new Point(3, 0))
+    .addPiece(new Piece(YELLOW),         new Point(3, 1))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 2))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 3))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 3))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 4))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 4))
+  ),
 
-  D(new Field(
-    new Piece(YELLOW,         1, 0),
-    new Piece(YELLOW,         2, 0),
-    new Piece(YELLOW,         0, 1),
-    new Piece(RED_HORIZONTAL, 1, 1),
-    new Piece(YELLOW,         3, 1),
-    new Piece(RED_HORIZONTAL, 0, 2),
-    new Piece(BLUE,           0, 3),
-    new Piece(RED_VERTICAL,   2, 2),
-    new Piece(RED_VERTICAL,   3, 2),
-    new Piece(RED_HORIZONTAL, 2, 4)
-  )),
+  D(new Field()
+    .addPiece(new Piece(YELLOW),         new Point(1, 0))
+    .addPiece(new Piece(YELLOW),         new Point(2, 0))
+    .addPiece(new Piece(YELLOW),         new Point(0, 1))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 1))
+    .addPiece(new Piece(YELLOW),         new Point(3, 1))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 2))
+    .addPiece(new Piece(BLUE),           new Point(0, 3))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(2, 2))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 2))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 4))
+  ),
 
-  E(new Field(
-    new Piece(RED_HORIZONTAL, 0, 0),
-    new Piece(RED_HORIZONTAL, 2, 0),
-    new Piece(RED_VERTICAL,   0, 1),
-    new Piece(BLUE,           1, 1),
-    new Piece(RED_VERTICAL,   3, 1),
-    new Piece(YELLOW,         0, 3),
-    new Piece(RED_HORIZONTAL, 1, 3),
-    new Piece(YELLOW,         3, 3),
-    new Piece(YELLOW,         0, 4),
-    new Piece(YELLOW,         3, 4)
-  )),
+  E(new Field()
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 0))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 0))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 1))
+    .addPiece(new Piece(BLUE),           new Point(1, 1))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 1))
+    .addPiece(new Piece(YELLOW),         new Point(0, 3))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 3))
+    .addPiece(new Piece(YELLOW),         new Point(3, 3))
+    .addPiece(new Piece(YELLOW),         new Point(0, 4))
+    .addPiece(new Piece(YELLOW),         new Point(3, 4))
+  ),
 
-  F(new Field(
-    new Piece(RED_HORIZONTAL, 0, 0),
-    new Piece(RED_HORIZONTAL, 2, 0),
-    new Piece(BLUE,           1, 1),
-    new Piece(RED_VERTICAL,   0, 2),
-    new Piece(RED_HORIZONTAL, 1, 3),
-    new Piece(RED_VERTICAL,   3, 2),
-    new Piece(YELLOW,         0, 4),
-    new Piece(YELLOW,         1, 4),
-    new Piece(YELLOW,         2, 4),
-    new Piece(YELLOW,         3, 4)
-  )),
+  F(new Field()
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 0))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 0))
+    .addPiece(new Piece(BLUE),           new Point(1, 1))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 2))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 3))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 2))
+    .addPiece(new Piece(YELLOW),         new Point(0, 4))
+    .addPiece(new Piece(YELLOW),         new Point(1, 4))
+    .addPiece(new Piece(YELLOW),         new Point(2, 4))
+    .addPiece(new Piece(YELLOW),         new Point(3, 4))
+  ),
 
-  G(new Field(
-    new Piece(RED_VERTICAL,   0, 0),
-    new Piece(BLUE,           1, 0),
-    new Piece(YELLOW,         3, 0),
-    new Piece(YELLOW,         3, 1),
-    new Piece(RED_HORIZONTAL, 1, 2),
-    new Piece(YELLOW,         0, 3),
-    new Piece(YELLOW,         0, 4),
-    new Piece(RED_HORIZONTAL, 1, 3),
-    new Piece(RED_HORIZONTAL, 1, 4),
-    new Piece(RED_VERTICAL,   3, 3)
-  )),
+  G(new Field()
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 0))
+    .addPiece(new Piece(BLUE),           new Point(1, 0))
+    .addPiece(new Piece(YELLOW),         new Point(3, 0))
+    .addPiece(new Piece(YELLOW),         new Point(3, 1))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 2))
+    .addPiece(new Piece(YELLOW),         new Point(0, 3))
+    .addPiece(new Piece(YELLOW),         new Point(0, 4))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 3))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 4))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 3))
+  ),
 
-  H(new Field(
-    new Piece(YELLOW,         0, 1),
-    new Piece(BLUE,           1, 0),
-    new Piece(YELLOW,         3, 1),
-    new Piece(RED_VERTICAL,   0, 2),
-    new Piece(YELLOW,         1, 2),
-    new Piece(YELLOW,         2, 2),
-    new Piece(RED_VERTICAL,   3, 2),
-    new Piece(RED_HORIZONTAL, 1, 3),
-    new Piece(RED_HORIZONTAL, 0, 4),
-    new Piece(RED_HORIZONTAL, 2, 4)
-  ));
+  H(new Field()
+    .addPiece(new Piece(YELLOW),         new Point(0, 1))
+    .addPiece(new Piece(BLUE),           new Point(1, 0))
+    .addPiece(new Piece(YELLOW),         new Point(3, 1))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(0, 2))
+    .addPiece(new Piece(YELLOW),         new Point(1, 2))
+    .addPiece(new Piece(YELLOW),         new Point(2, 2))
+    .addPiece(new Piece(RED_VERTICAL),   new Point(3, 2))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(1, 3))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(0, 4))
+    .addPiece(new Piece(RED_HORIZONTAL), new Point(2, 4))
+  );
 
   private final Field field;
 

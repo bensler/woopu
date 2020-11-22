@@ -2,6 +2,7 @@ package com.bensler.woopu;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
@@ -63,7 +64,9 @@ public class FieldComponent extends JComponent {
   }
 
   protected Rectangle getPiecePixBounds(Piece piece) {
-    return getGridPixBounds(piece.getLeftX(), piece.getTopY(), piece.getWidth(), piece.getHeight());
+    final Point position = field.getPosition(piece);
+
+    return getGridPixBounds(piece.getLeftX(position), piece.getTopY(position), piece.getWidth(), piece.getHeight());
   }
 
   protected Rectangle getGridPixBounds(int gridX, int gridY, int gridWidth, int gridHeight) {
@@ -73,6 +76,10 @@ public class FieldComponent extends JComponent {
       gridSize * gridWidth,
       gridSize * gridHeight
     );
+  }
+
+  public Point getPiecePosition(Piece piece) {
+    return field.getPosition(piece);
   }
 
 }

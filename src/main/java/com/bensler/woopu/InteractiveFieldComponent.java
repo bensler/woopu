@@ -11,10 +11,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.stream.Collectors;
 
 import javax.swing.event.AncestorEvent;
 
@@ -75,7 +73,7 @@ public class InteractiveFieldComponent extends FieldComponent {
   void moveSelectedPiece(Direction direction) {
    if (
      (selectedPiece != null)
-      && field.arePositionsFree(direction.getNewlyOccupiedPositions(selectedPiece))
+      && field.arePositionsFree(selectedPiece, direction)
     ) {
       movePiece(selectedPiece, direction);
     }
@@ -93,27 +91,24 @@ public class InteractiveFieldComponent extends FieldComponent {
   }
 
   void movePiece(Piece pieceToMove, Direction direction) {
-    final List<Piece> newPieces = field.pieces().filter(piece -> (piece != pieceToMove)).collect(Collectors.toList());
-    final Point newPosition = direction.getNewPosition(pieceToMove);
-    final Piece newPiece = new Piece(pieceToMove.type, newPosition.x, newPosition.y);
     final AnimationTask task;
 
-    newPieces.add(newPiece);
     task = new AnimationTask(new AnimationProgress<>(
       AnimationProgress.ATAN_TRANSFORMER,
       new MovingPiece(this, pieceToMove, direction),
       thisAnimation -> animation = thisAnimation,
       thisAnimation -> paintImmediately(getBounds()),
-      thisAnimation -> animationFinished(newPieces, newPiece, direction.getNewPosition(selection))
+      thisAnimation -> animationFinished(pieceToMove, direction)
     ), 500, FRAME_RATE);
     timer.scheduleAtFixedRate(task, 0, task.getMsPerFrame());
   }
 
-  void animationFinished(List<Piece> newPieces, Piece newPiece, Point newSelection) {
+  void animationFinished(Piece movingPiece, Direction direction) {
+    final Point newPosition = direction.getNewPosition(movingPiece, field.getPosition(movingPiece));
     animation = null;
-    setField(new Field(newPieces));
-    selectedPiece = newPiece;
-    selection = newSelection;
+    field.setPosition(movingPiece, newPosition);
+    selectedPiece = movingPiece;
+    selection = direction.getNewPosition(selection);
   }
 
   void mouseClicked(Point mousePos) {
@@ -198,14 +193,14 @@ public class InteractiveFieldComponent extends FieldComponent {
     private final Direction direction;
 
     public MovingPiece(InteractiveFieldComponent fieldComp, Piece aMovingPiece, Direction aDirection) {
+      final Point position = fieldComp.getPiecePosition(movingPiece = aMovingPiece);
       final int gridWidth = fieldComp.gridSize;
       final Rectangle clipGrid;
 
-      movingPiece = aMovingPiece;
       direction = aDirection;
       clipGrid = new Rectangle(
-        Math.min(movingPiece.getLeftX(), movingPiece.getLeftX() + direction.getDeltaX()),
-        Math.min(movingPiece.getTopY(), movingPiece.getTopY() + direction.getDeltaY()),
+        Math.min(movingPiece.getLeftX(position), movingPiece.getLeftX(position) + direction.getDeltaX()),
+        Math.min(movingPiece.getTopY(position), movingPiece.getTopY(position) + direction.getDeltaY()),
         movingPiece.getWidth() + Math.abs(direction.getDeltaX()),
         movingPiece.getHeight() + Math.abs(direction.getDeltaY())
       );

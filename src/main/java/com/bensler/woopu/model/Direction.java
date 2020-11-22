@@ -7,48 +7,48 @@ import java.util.List;
 public enum Direction {
   NORTH (0, -1) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece) {
-      final int y = piece.getTopY() - 1;
+    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
+      final int y = piece.getTopY(position) - 1;
       final List<Point> result = new ArrayList<>(piece.getWidth());
 
       for (int i = 0; i < piece.getWidth(); i++) {
-        result.add(new Point(piece.getLeftX() + i, y));
+        result.add(new Point(piece.getLeftX(position) + i, y));
       }
       return result;
     }
   },
   EAST (1, 0) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece) {
-      final int x = piece.getRightX() + 1;
+    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
+      final int x = piece.getRightX(position) + 1;
       final List<Point> result = new ArrayList<>(piece.getHeight());
 
       for (int i = 0; i < piece.getHeight(); i++) {
-        result.add(new Point(x, piece.getTopY() + i));
+        result.add(new Point(x, piece.getTopY(position) + i));
       }
       return result;
     }
   },
   SOUTH (0, 1) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece) {
-      final int y = piece.getBottomY() + 1;
+    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
+      final int y = piece.getBottomY(position) + 1;
       final List<Point> result = new ArrayList<>(piece.getWidth());
 
       for (int i = 0; i < piece.getWidth(); i++) {
-        result.add(new Point(piece.getLeftX() + i, y));
+        result.add(new Point(piece.getLeftX(position) + i, y));
       }
       return result;
     }
   },
   WEST (-1, 0) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece) {
-      final int x = piece.getLeftX() - 1;
+    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
+      final int x = piece.getLeftX(position) - 1;
       final List<Point> result = new ArrayList<>(piece.getHeight());
 
       for (int i = 0; i < piece.getHeight(); i++) {
-        result.add(new Point(x, piece.getTopY() + i));
+        result.add(new Point(x, piece.getTopY(position) + i));
       }
 
       return result;
@@ -63,7 +63,7 @@ public enum Direction {
     deltaY = aDeltaY;
   }
 
-  public abstract List<Point> getNewlyOccupiedPositions(Piece piece);
+  public abstract List<Point> getNewlyOccupiedPositions(Piece piece, Point position);
 
   public int getDeltaX() {
     return deltaX;
@@ -73,8 +73,8 @@ public enum Direction {
     return deltaY;
   }
 
-  public Point getNewPosition(Piece piece) {
-    return getNewPosition(piece.getPosition());
+  public Point getNewPosition(Piece piece, Point position) {
+    return getNewPosition(position);
   }
 
   public Point getNewPosition(Point position) {

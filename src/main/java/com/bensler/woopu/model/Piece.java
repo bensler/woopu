@@ -5,13 +5,9 @@ import java.awt.Point;
 public class Piece {
 
   public final PieceType type;
-  private final int x;
-  private final int y;
 
-  public Piece(PieceType aType, int aX, int aY) {
+  public Piece(PieceType aType) {
     type = aType;
-    x = aX;
-    y = aY;
   }
 
   public int getWidth() {
@@ -22,42 +18,42 @@ public class Piece {
     return type.height;
   }
 
-  public int getLeftX() {
-    return x;
+  public int getLeftX(Point position) {
+    return position.x;
   }
 
-  public int getRightX() {
-    return x + type.width - 1;
+  public int getRightX(Point position) {
+    return position.x + type.width - 1;
   }
 
-  public int getTopY() {
-    return y;
+  public int getTopY(Point position) {
+    return position.y;
   }
 
-  public int getBottomY() {
-    return y + type.height - 1;
-  }
-
-  public Point getPosition() {
-    return new Point(x, y);
+  public int getBottomY(Point position) {
+    return position.y + type.height - 1;
   }
 
   @Override
   public String toString() {
-    return String.format("Piece[%s, %d, %d]", type.name(), x, y);
+    return String.format("Piece[%s]", type.name());
   }
 
-  public boolean intersectWith(Piece other) {
+  public boolean intersectWith(Point position, Piece other, Point otherPosition) {
     return (
-         (getRightX()  >= other.x) && (x <= other.getRightX())
-      && (getBottomY() >= other.y) && (y <= other.getBottomY())
+         (getRightX(position)  >= otherPosition.x)
+      && (position.x <= other.getRightX(otherPosition))
+      && (getBottomY(position) >= otherPosition.y)
+      && (position.y <= other.getBottomY(otherPosition))
     );
   }
 
-  public boolean covers(int xPos, int yPos) {
+  public boolean covers(Point ownPosition, Point positionToTest) {
     return (
-         (xPos >= getLeftX()) && (xPos <= getRightX())
-      && (yPos >= getTopY()) && (yPos <= getBottomY())
+         (positionToTest.x >= getLeftX(ownPosition))
+      && (positionToTest.x <= getRightX(ownPosition))
+      && (positionToTest.y >= getTopY(ownPosition))
+      && (positionToTest.y <= getBottomY(ownPosition))
     );
   }
 

@@ -34,22 +34,24 @@ public class AnimationTask extends TimerTask {
 
   @Override
   public void run() {
-    final boolean firstRun = (frameCount == 0);
-    final boolean lastRun = (finishImmediately || (frameCount >= maxFrameCount));
-
-    progress.beforePaint(firstRun, lastRun);
     try {
-      SwingUtilities.invokeAndWait(() -> progress.triggerPaint());
+      SwingUtilities.invokeAndWait(() -> {
+        final boolean firstRun = (frameCount == 0);
+        final boolean lastRun = (finishImmediately || (frameCount >= maxFrameCount));
+
+        progress.beforePaint(firstRun, lastRun);
+        progress.triggerPaint();
+        progress.afterPaint(firstRun, lastRun);
+        if (lastRun || finishImmediately) {
+          cancel();
+        }
+        frameCount++;
+      });
     } catch (InterruptedException ie) {
       // swallow intentionally
     } catch (InvocationTargetException ite) {
       ite.getCause().printStackTrace();
     }
-    progress.afterPaint(firstRun, lastRun);
-    if (lastRun || finishImmediately) {
-      cancel();
-    }
-    frameCount++;
   }
 
 }
