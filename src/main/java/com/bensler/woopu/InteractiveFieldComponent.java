@@ -9,9 +9,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-import java.util.Map;
 import java.util.Timer;
 
 import javax.swing.event.AncestorEvent;
@@ -25,14 +23,8 @@ import com.bensler.woopu.ui.anim.AnimationTask;
 
 public class InteractiveFieldComponent extends FieldComponent {
 
-  final static Map<Integer, Direction> keyCodeDirectionMap = Map.of(
-    KeyEvent.VK_UP,    Direction.NORTH,
-    KeyEvent.VK_RIGHT, Direction.EAST,
-    KeyEvent.VK_DOWN,  Direction.SOUTH,
-    KeyEvent.VK_LEFT,  Direction.WEST
-  );
-
-  private   final Timer timer;
+  private final History history;
+  private final Timer timer;
 
   private AnimationProgress<MovingPiece> animation;
 
@@ -41,6 +33,7 @@ public class InteractiveFieldComponent extends FieldComponent {
 
   public InteractiveFieldComponent(float gridScaleFactor, ImageSource anImgSrc, Field aField) {
     super(gridScaleFactor, anImgSrc, aField);
+    history = new History();
     timer = new Timer();
 
     addAncestorListener(new AncestorAdapter() {
@@ -70,12 +63,12 @@ public class InteractiveFieldComponent extends FieldComponent {
     });
   }
 
-  void moveSelectedPiece(Direction direction) {
+  public void moveSelectedPiece(Direction direction) {
    if (
      (selectedPiece != null)
       && field.arePositionsFree(selectedPiece, direction)
     ) {
-      movePiece(selectedPiece, direction);
+      move(new Move(selectedPiece, direction));
     }
   }
 
@@ -90,7 +83,20 @@ public class InteractiveFieldComponent extends FieldComponent {
     }
   }
 
-  void movePiece(Piece pieceToMove, Direction direction) {
+  public void undo() {
+    if (!history.isEmpty()) {
+      final Move lastMove = history.pop();
+
+      movePiece(lastMove.getMovingPiece(), lastMove.getDirection().getOpposite());
+    }
+  }
+
+  private void move(Move move) {
+    history.push(move);
+    movePiece(move.getMovingPiece(), move.getDirection());
+  }
+
+  private void movePiece(Piece pieceToMove, Direction direction) {
     final AnimationTask task;
 
     task = new AnimationTask(new AnimationProgress<>(

@@ -3,6 +3,7 @@ package com.bensler.woopu.model;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public enum Direction {
   NORTH (0, -1) {
@@ -63,6 +64,13 @@ public enum Direction {
     deltaY = aDeltaY;
   }
 
+  private static final Map<Direction, Direction> oppositeDirection = Map.of(
+    NORTH, SOUTH,
+    SOUTH, NORTH,
+    EAST, WEST,
+    WEST, EAST
+  );
+
   public abstract List<Point> getNewlyOccupiedPositions(Piece piece, Point position);
 
   public int getDeltaX() {
@@ -71,6 +79,10 @@ public enum Direction {
 
   public int getDeltaY() {
     return deltaY;
+  }
+
+  public Direction getOpposite() {
+    return oppositeDirection.get(this);
   }
 
   public Point getNewPosition(Piece piece, Point position) {
