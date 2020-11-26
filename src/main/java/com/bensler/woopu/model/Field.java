@@ -98,6 +98,10 @@ public class Field {
     return true;
   }
 
+  public boolean isPieceCovering(Piece piece, Point positionToTest) {
+    return piece.covers(piecePositions.get(piece), positionToTest);
+  }
+
   public void setPosition(Piece piece, Point newPosition) {
     if (!piecePositions.containsKey(piece)) {
       throw new IllegalArgumentException(String.format("unknown piece %s", piece));

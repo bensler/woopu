@@ -78,8 +78,8 @@ public class AnimationProgress<CONTEXT> {
     task = animationTask;
   }
 
-  public void finishImmediately() {
-    task.finishImmediately();
+  public void terminatedImmediately() {
+    task.terminatedImmediately();
   }
 
   void beforePaint(boolean firstRun, boolean lastRun) {
@@ -96,6 +96,10 @@ public class AnimationProgress<CONTEXT> {
     }
   }
 
+  /**
+   * @param firstRun ... unused but wanted this method having the same signature like
+   *      {@link #beforePaint(boolean, boolean)}
+   */
   void afterPaint(boolean firstRun, boolean lastRun) {
     if (lastRun) {
       doneListener.accept(this);

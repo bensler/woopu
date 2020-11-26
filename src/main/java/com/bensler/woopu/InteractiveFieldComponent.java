@@ -68,7 +68,8 @@ public class InteractiveFieldComponent extends FieldComponent {
      (selectedPiece != null)
       && field.arePositionsFree(selectedPiece, direction)
     ) {
-      move(new Move(selectedPiece, direction));
+      history.push(new Move(selectedPiece, direction));
+      movePiece(selectedPiece, direction);
     }
   }
 
@@ -91,30 +92,23 @@ public class InteractiveFieldComponent extends FieldComponent {
     }
   }
 
-  private void move(Move move) {
-    history.push(move);
-    movePiece(move.getMovingPiece(), move.getDirection());
-  }
-
   private void movePiece(Piece pieceToMove, Direction direction) {
     final AnimationTask task;
+    final Point oldPiecePos = field.getPosition(pieceToMove);
+    final Point newPiecePos = direction.getNewPosition(field.getPosition(pieceToMove));
 
+    if ((selection != null) && field.isPieceCovering(pieceToMove, selection)) {
+      selection = direction.getNewPosition(selection);
+    }
+    field.setPosition(pieceToMove, newPiecePos);
     task = new AnimationTask(new AnimationProgress<>(
       AnimationProgress.ATAN_TRANSFORMER,
-      new MovingPiece(this, pieceToMove, direction),
+      new MovingPiece(this, oldPiecePos, pieceToMove),
       thisAnimation -> animation = thisAnimation,
-      thisAnimation -> paintImmediately(getBounds()),
-      thisAnimation -> animationFinished(pieceToMove, direction)
+      thisAnimation -> paintImmediately(thisAnimation.getContext().getClippingRect()),
+      thisAnimation -> animation = null
     ), 500, FRAME_RATE);
     timer.scheduleAtFixedRate(task, 0, task.getMsPerFrame());
-  }
-
-  void animationFinished(Piece movingPiece, Direction direction) {
-    final Point newPosition = direction.getNewPosition(movingPiece, field.getPosition(movingPiece));
-    animation = null;
-    field.setPosition(movingPiece, newPosition);
-    selectedPiece = movingPiece;
-    selection = direction.getNewPosition(selection);
   }
 
   void mouseClicked(Point mousePos) {
@@ -148,11 +142,11 @@ public class InteractiveFieldComponent extends FieldComponent {
     if (animation != null) {
       animation.getContext().paint(this, g, animation.getProgressRatio());
     } else {
-      drawSelection(g, 0, 0);
+      paintSelection(g, 0, 0);
     }
   }
 
-  private void drawSelection(Graphics g, int deltaXPix, int deltaYPix) {
+  private void paintSelection(Graphics g, int deltaXPix, int deltaYPix) {
     if (selection != null) {
       final Rectangle pixBounds = getGridPixBounds(selection.x, selection.y, 1, 1);
 
@@ -188,27 +182,29 @@ public class InteractiveFieldComponent extends FieldComponent {
 
   public void finishAnimation() {
     if (animation != null) {
-      animation.finishImmediately();
+      animation.terminatedImmediately();
     }
   }
 
   static class MovingPiece {
 
-    private final Piece movingPiece;
+    private final int deltaX;
+    private final int deltaY;
+    private final Piece piece;
     private final Rectangle clippingRect;
-    private final Direction direction;
 
-    public MovingPiece(InteractiveFieldComponent fieldComp, Piece aMovingPiece, Direction aDirection) {
-      final Point position = fieldComp.getPiecePosition(movingPiece = aMovingPiece);
+    public MovingPiece(InteractiveFieldComponent fieldComp, Point oldPiecePos, Piece movingPiece) {
+      final Point position = fieldComp.getPiecePosition(piece = movingPiece);
+      deltaX = oldPiecePos.x - position.x;
+      deltaY = oldPiecePos.y - position.y;
       final int gridWidth = fieldComp.gridSize;
       final Rectangle clipGrid;
 
-      direction = aDirection;
       clipGrid = new Rectangle(
-        Math.min(movingPiece.getLeftX(position), movingPiece.getLeftX(position) + direction.getDeltaX()),
-        Math.min(movingPiece.getTopY(position), movingPiece.getTopY(position) + direction.getDeltaY()),
-        movingPiece.getWidth() + Math.abs(direction.getDeltaX()),
-        movingPiece.getHeight() + Math.abs(direction.getDeltaY())
+        Math.min(piece.getLeftX(position), oldPiecePos.x),
+        Math.min(piece.getTopY(position), oldPiecePos.y),
+        piece.getWidth() + Math.abs(oldPiecePos.x - position.x),
+        piece.getHeight() + Math.abs(oldPiecePos.y - position.y)
       );
       clippingRect = new Rectangle(
         fieldComp.frameWidth + (gridWidth * clipGrid.x),
@@ -221,17 +217,21 @@ public class InteractiveFieldComponent extends FieldComponent {
     void paint(InteractiveFieldComponent fieldComp, Graphics g, float progressRatio) {
       final int gridWidth = fieldComp.gridSize;
       final Shape oldClip = g.getClip();
-      final int deltaXPix = Math.round(gridWidth * progressRatio * direction.getDeltaX());
-      final int deltaYPix = Math.round(gridWidth * progressRatio * direction.getDeltaY());
+      final int deltaXPix = Math.round(gridWidth * (1 - progressRatio) * deltaX);
+      final int deltaYPix = Math.round(gridWidth * (1 - progressRatio) * deltaY);
 
       try {
         g.setClip(clippingRect);
         fieldComp.paintBackground(g);
-        fieldComp.paintPiece(g, movingPiece, deltaXPix, deltaYPix);
-        fieldComp.drawSelection(g, deltaXPix, deltaYPix);
+        fieldComp.paintPiece(g, piece, deltaXPix, deltaYPix);
+        fieldComp.paintSelection(g, deltaXPix, deltaYPix);
       } finally {
         g.setClip(oldClip);
       }
+    }
+
+    Rectangle getClippingRect() {
+      return clippingRect;
     }
 
   }

@@ -13,7 +13,7 @@ public class AnimationTask extends TimerTask {
   private final int maxFrameCount;
   private final int msPerFrame;
 
-  private boolean finishImmediately;
+  private volatile boolean terminated;
   private int frameCount;
 
   public AnimationTask(AnimationProgress<?> anAnimationState, long durationMillies, int frameRate) {
@@ -21,36 +21,47 @@ public class AnimationTask extends TimerTask {
     maxFrameCount = Math.round(durationMillies / (float)msPerFrame);
     (progress = anAnimationState).setDurationNanos((maxFrameCount * msPerFrame) * 1_000_000);
     progress.setTask(this);
-    finishImmediately = false;
+    terminated = false;
   }
 
   public int getMsPerFrame() {
     return msPerFrame;
   }
 
-  void finishImmediately() {
-    finishImmediately = true;
+  synchronized void terminatedImmediately() {
+    cancel();
+    frameCount = maxFrameCount;
+    run();
+    terminated = true;
   }
 
   @Override
-  public void run() {
-    try {
-      SwingUtilities.invokeAndWait(() -> {
-        final boolean firstRun = (frameCount == 0);
-        final boolean lastRun = (finishImmediately || (frameCount >= maxFrameCount));
+  public synchronized void run() {
+    if (!terminated) {
+      try {
+        Runnable runnable = () -> {
+          final boolean firstRun = (frameCount == 0);
+          final boolean lastRun = (frameCount >= maxFrameCount);
 
-        progress.beforePaint(firstRun, lastRun);
-        progress.triggerPaint();
-        progress.afterPaint(firstRun, lastRun);
-        if (lastRun || finishImmediately) {
-          cancel();
+          progress.beforePaint(firstRun, lastRun);
+          progress.triggerPaint();
+          progress.afterPaint(firstRun, lastRun);
+          if (lastRun) {
+            cancel();
+          } else {
+            frameCount++;
+          }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+          runnable.run();
+        } else {
+          SwingUtilities.invokeAndWait(runnable);
         }
-        frameCount++;
-      });
-    } catch (InterruptedException ie) {
-      // swallow intentionally
-    } catch (InvocationTargetException ite) {
-      ite.getCause().printStackTrace();
+      } catch (InterruptedException ie) {
+        // swallow intentionally
+      } catch (InvocationTargetException ite) {
+        ite.getCause().printStackTrace();
+      }
     }
   }
 

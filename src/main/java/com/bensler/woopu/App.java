@@ -28,7 +28,7 @@ public class App implements ActionListener {
     new App();
   }
 
-  private final Map<JButton, Field> btnToField;
+  private final Map<JButton, Fields> btnToField;
   private final FieldComponent mainFieldComp;
 
   public App() throws UnsupportedLookAndFeelException, IOException {
@@ -54,11 +54,12 @@ public class App implements ActionListener {
     ));
 
     for (int i = 0; i < fields.length; i++) {
-      final Field field = fields[i].getField();
-      final JButton btn = new JButton(new ComponentIconAdapter(new FieldComponent(0.3f, imgSrc, field)));
+      final JButton btn = new JButton(new ComponentIconAdapter(
+        new FieldComponent(0.3f, imgSrc, new Field(fields[i].getField()))
+      ));
 
       btn.setMargin(new Insets(5, 5, 5, 5));
-      btnToField.put(btn, field);
+      btnToField.put(btn, fields[i]);
       btn.addActionListener(this);
       buttonPanel.add(btn, new CellConstraints(1, (i * 2) + 1));
     }
@@ -67,7 +68,7 @@ public class App implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    mainFieldComp.setField(btnToField.get(evt.getSource()));
+    mainFieldComp.setField(new Field(btnToField.get(evt.getSource()).getField()));
   }
 
 }

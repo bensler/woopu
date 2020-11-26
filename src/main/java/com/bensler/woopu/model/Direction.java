@@ -85,10 +85,6 @@ public enum Direction {
     return oppositeDirection.get(this);
   }
 
-  public Point getNewPosition(Piece piece, Point position) {
-    return getNewPosition(position);
-  }
-
   public Point getNewPosition(Point position) {
     return new Point(position.x + deltaX, position.y  + deltaY);
   }
