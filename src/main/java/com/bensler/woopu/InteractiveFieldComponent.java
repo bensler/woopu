@@ -6,10 +6,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
+import java.util.List;
 import java.util.Timer;
 
 import javax.swing.event.AncestorEvent;
@@ -26,7 +26,7 @@ public class InteractiveFieldComponent extends FieldComponent {
   private final History history;
   private final Timer timer;
 
-  private AnimationProgress<MovingPiece> animation;
+  private AnimationProgress<MovingPieces> animation;
 
   private Piece selectedPiece;
   private Point selection;
@@ -41,7 +41,6 @@ public class InteractiveFieldComponent extends FieldComponent {
       public void ancestorRemoved(AncestorEvent event) {
         timer.cancel();
       }
-
     });
     final MouseAdapter leAdapteurDeMouse = new MouseEventSource(this);
 
@@ -59,17 +58,16 @@ public class InteractiveFieldComponent extends FieldComponent {
       public void focusGained(FocusEvent e) {
         repaint();
       }
-
     });
   }
 
   public void moveSelectedPiece(Direction direction) {
-   if (
-     (selectedPiece != null)
-      && field.arePositionsFree(selectedPiece, direction)
-    ) {
-      history.push(new Move(selectedPiece, direction));
-      movePiece(selectedPiece, direction);
+    if (selectedPiece != null) {
+      final List<Piece> piecesToMove = field.getPiecesToMove(selectedPiece, direction);
+
+      if (!piecesToMove.isEmpty()) {
+        movePieces(history.push(new Move(piecesToMove, direction)));
+      }
     }
   }
 
@@ -78,7 +76,7 @@ public class InteractiveFieldComponent extends FieldComponent {
       final Point newSelection = direction.getNewPosition(selection);
 
       if (field.isInField(newSelection)) {
-        selectedPiece = field.pieceAt(selection = newSelection);
+        selectedPiece = field.pieceAt(selection = newSelection).orElse(null);
         repaint();
       }
     }
@@ -86,24 +84,28 @@ public class InteractiveFieldComponent extends FieldComponent {
 
   public void undo() {
     if (!history.isEmpty()) {
-      final Move lastMove = history.pop();
-
-      movePiece(lastMove.getMovingPiece(), lastMove.getDirection().getOpposite());
+      movePieces(history.pop().createOppositeMove());
     }
   }
 
-  private void movePiece(Piece pieceToMove, Direction direction) {
+  private void movePieces(Move move) {
     final AnimationTask task;
-    final Point oldPiecePos = field.getPosition(pieceToMove);
-    final Point newPiecePos = direction.getNewPosition(field.getPosition(pieceToMove));
+    final Direction direction = move.getDirection();
 
-    if ((selection != null) && field.isPieceCovering(pieceToMove, selection)) {
-      selection = direction.getNewPosition(selection);
+    if (selection != null) {
+      for (Piece piece : move) {
+        if (field.isPieceCovering(piece, selection)) {
+          selection = direction.getNewPosition(selection);
+          break;
+        }
+      }
     }
-    field.setPosition(pieceToMove, newPiecePos);
+    move.forEachPiece(piece -> field.setPosition(
+      piece, direction.getNewPosition(field.getPosition(piece))
+    ));
     task = new AnimationTask(new AnimationProgress<>(
       AnimationProgress.ATAN_TRANSFORMER,
-      new MovingPiece(this, oldPiecePos, pieceToMove),
+      new MovingPieces(this, move),
       thisAnimation -> animation = thisAnimation,
       thisAnimation -> paintImmediately(thisAnimation.getContext().getClippingRect()),
       thisAnimation -> animation = null
@@ -118,12 +120,9 @@ public class InteractiveFieldComponent extends FieldComponent {
     );
 
     if (field.isInField(selectionCandidate)) {
-      final Piece piece = field.pieceAt(selectionCandidate);
-
-      selection = selectionCandidate;
-      if (piece != null) {
-        selectedPiece = piece;
-      }
+      field.pieceAt(selection = selectionCandidate).ifPresent(
+        newlySelectedPiece -> selectedPiece = newlySelectedPiece
+      );
       repaint();
     }
     grabFocus();
@@ -146,7 +145,7 @@ public class InteractiveFieldComponent extends FieldComponent {
     }
   }
 
-  private void paintSelection(Graphics g, int deltaXPix, int deltaYPix) {
+  void paintSelection(Graphics g, int deltaXPix, int deltaYPix) {
     if (selection != null) {
       final Rectangle pixBounds = getGridPixBounds(selection.x, selection.y, 1, 1);
 
@@ -184,56 +183,6 @@ public class InteractiveFieldComponent extends FieldComponent {
     if (animation != null) {
       animation.terminatedImmediately();
     }
-  }
-
-  static class MovingPiece {
-
-    private final int deltaX;
-    private final int deltaY;
-    private final Piece piece;
-    private final Rectangle clippingRect;
-
-    public MovingPiece(InteractiveFieldComponent fieldComp, Point oldPiecePos, Piece movingPiece) {
-      final Point position = fieldComp.getPiecePosition(piece = movingPiece);
-      deltaX = oldPiecePos.x - position.x;
-      deltaY = oldPiecePos.y - position.y;
-      final int gridWidth = fieldComp.gridSize;
-      final Rectangle clipGrid;
-
-      clipGrid = new Rectangle(
-        Math.min(piece.getLeftX(position), oldPiecePos.x),
-        Math.min(piece.getTopY(position), oldPiecePos.y),
-        piece.getWidth() + Math.abs(oldPiecePos.x - position.x),
-        piece.getHeight() + Math.abs(oldPiecePos.y - position.y)
-      );
-      clippingRect = new Rectangle(
-        fieldComp.frameWidth + (gridWidth * clipGrid.x),
-        fieldComp.frameWidth + (gridWidth * clipGrid.y),
-        gridWidth * clipGrid.width,
-        gridWidth * clipGrid.height
-      );
-    }
-
-    void paint(InteractiveFieldComponent fieldComp, Graphics g, float progressRatio) {
-      final int gridWidth = fieldComp.gridSize;
-      final Shape oldClip = g.getClip();
-      final int deltaXPix = Math.round(gridWidth * (1 - progressRatio) * deltaX);
-      final int deltaYPix = Math.round(gridWidth * (1 - progressRatio) * deltaY);
-
-      try {
-        g.setClip(clippingRect);
-        fieldComp.paintBackground(g);
-        fieldComp.paintPiece(g, piece, deltaXPix, deltaYPix);
-        fieldComp.paintSelection(g, deltaXPix, deltaYPix);
-      } finally {
-        g.setClip(oldClip);
-      }
-    }
-
-    Rectangle getClippingRect() {
-      return clippingRect;
-    }
-
   }
 
 }

@@ -1,10 +1,13 @@
 package com.bensler.woopu.model;
 
 import java.awt.Point;
-import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -34,9 +37,6 @@ public class Field {
   }
 
   public Field addPiece(Piece newPiece, Point newPosition) {
-    if (piecePositions.containsKey(newPiece)) {
-      throw new IllegalArgumentException(String.format("%s is already part of this field", newPiece));
-    }
     if (
       (newPiece.getLeftX(newPosition) < 0)
       || (newPiece.getRightX(newPosition) >= WIDTH)
@@ -46,12 +46,22 @@ public class Field {
       throw new IllegalArgumentException(String.format("%s does not fit into Field[%d, %d]", newPiece, WIDTH, HEIGHT));
     }
     for (Piece piece : piecePositions.keySet()) {
-      if (piece.intersectWith(getPosition(piece), newPiece, newPosition)) {
+      if (
+        (piece != newPiece)
+        && piece.intersectWith(getPosition(piece), newPiece, newPosition)
+      ) {
         throw new IllegalArgumentException(String.format("%s overlaps with %s", newPiece, piece));
       }
     }
     piecePositions.put(newPiece, newPosition);
     return this;
+  }
+
+  public void setPosition(Piece piece, Point newPosition) {
+    if (!piecePositions.containsKey(piece)) {
+      throw new IllegalArgumentException(String.format("unknown piece %s", piece));
+    }
+    addPiece(piece, newPosition);
   }
 
   public boolean isInField(Point position) {
@@ -65,48 +75,47 @@ public class Field {
     return piecePositions.keySet().stream();
   }
 
-  public Piece pieceAt(Point position) {
+  public Optional<Piece> pieceAt(Point position) {
     return piecePositions.entrySet().stream().filter(
       piPo -> piPo.getKey().covers(piPo.getValue(), position)
-    ).findFirst().orElseGet(
-      () -> new SimpleImmutableEntry<>(null, null)
-    ).getKey();
+    ).findFirst().flatMap(entry -> Optional.of(entry.getKey()));
   }
 
   public Point getPosition(Piece piece) {
     return piecePositions.get(piece);
   }
 
-  public boolean arePositionsFree(Piece piece, Direction direction) {
-    for (Point position : direction.getNewlyOccupiedPositions(piece, getPosition(piece))) {
-      if (!isPositionFree(position)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  public List<Piece> getPiecesToMove(Piece piece, Direction direction) {
+    final Set<Piece> othersToMove = new HashSet<>();
 
-  public boolean isPositionFree(Point positionToTest) {
-    if (!isInField(positionToTest)) {
-      return false;
-    }
-    for (Entry<Piece, Point> piPo : piecePositions.entrySet()) {
-      if (piPo.getKey().covers(piPo.getValue(), positionToTest)) {
-        return false;
+    for (Point position : direction.getNewlyOccupiedPositions(piece, getPosition(piece))) {
+      if (isInField(position)) {
+        pieceAt(position).ifPresent(dependingOnPiece -> othersToMove.add(dependingOnPiece));
+      } else {
+        return List.of();
       }
     }
-    return true;
+    if (othersToMove.isEmpty()) {
+      return List.of(piece);
+    } else {
+      final List<Piece> result = new ArrayList<>();
+
+      for (Piece dependingOnPiece : othersToMove) {
+        final List<Piece> subResult = getPiecesToMove(dependingOnPiece, direction);
+
+        if (subResult.isEmpty()) {
+          return List.of();
+        } else {
+          result.addAll(subResult);
+        }
+      }
+      result.add(piece);
+      return List.copyOf(result);
+    }
   }
 
   public boolean isPieceCovering(Piece piece, Point positionToTest) {
     return piece.covers(piecePositions.get(piece), positionToTest);
-  }
-
-  public void setPosition(Piece piece, Point newPosition) {
-    if (!piecePositions.containsKey(piece)) {
-      throw new IllegalArgumentException(String.format("unknown piece %s", piece));
-    }
-    piecePositions.put(piece, newPosition);
   }
 
 }

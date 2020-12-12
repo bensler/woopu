@@ -10,8 +10,12 @@ public class History {
     moves = new LinkedList<>();
   }
 
-  public void push(Move move) {
+  /**
+   * @return the given <code>move</code>
+   */
+  public Move push(Move move) {
     moves.add(move);
+    return move;
   }
 
   public Move pop() {
