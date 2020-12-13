@@ -1,68 +1,37 @@
 package com.bensler.woopu.model;
 
 import java.awt.Point;
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public enum Direction {
-  NORTH (0, -1) {
+  NORTH (0, -1, Piece::getWidth) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
-      final int y = piece.getTopY(position) - 1;
-      final List<Point> result = new ArrayList<>(piece.getWidth());
-
-      for (int i = 0; i < piece.getWidth(); i++) {
-        result.add(new Point(piece.getLeftX(position) + i, y));
-      }
-      return result;
+    protected Point getNewlyOccupiedPosition(Piece piece, Point position, int newPositionIndex) {
+      return new Point(piece.getLeftX(position) + newPositionIndex, piece.getTopY(position) - 1);
     }
   },
-  EAST (1, 0) {
+  EAST (1, 0, Piece::getHeight) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
-      final int x = piece.getRightX(position) + 1;
-      final List<Point> result = new ArrayList<>(piece.getHeight());
-
-      for (int i = 0; i < piece.getHeight(); i++) {
-        result.add(new Point(x, piece.getTopY(position) + i));
-      }
-      return result;
+    protected Point getNewlyOccupiedPosition(Piece piece, Point position, int newPositionIndex) {
+      return new Point(piece.getRightX(position) + 1, piece.getTopY(position) + newPositionIndex);
     }
   },
-  SOUTH (0, 1) {
+  SOUTH (0, 1, Piece::getWidth) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
-      final int y = piece.getBottomY(position) + 1;
-      final List<Point> result = new ArrayList<>(piece.getWidth());
-
-      for (int i = 0; i < piece.getWidth(); i++) {
-        result.add(new Point(piece.getLeftX(position) + i, y));
-      }
-      return result;
+    protected Point getNewlyOccupiedPosition(Piece piece, Point position, int newPositionIndex) {
+      return new Point(piece.getLeftX(position) + newPositionIndex, piece.getBottomY(position) + 1);
     }
   },
-  WEST (-1, 0) {
+  WEST (-1, 0, Piece::getHeight) {
     @Override
-    public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
-      final int x = piece.getLeftX(position) - 1;
-      final List<Point> result = new ArrayList<>(piece.getHeight());
-
-      for (int i = 0; i < piece.getHeight(); i++) {
-        result.add(new Point(x, piece.getTopY(position) + i));
-      }
-
-      return result;
+    protected Point getNewlyOccupiedPosition(Piece piece, Point position, int newPositionIndex) {
+      return new Point(piece.getLeftX(position) - 1, piece.getTopY(position) + newPositionIndex);
     }
   };
-
-  private final int deltaX;
-  private final int deltaY;
-
-  Direction(int aDeltaX, int aDeltaY) {
-    deltaX = aDeltaX;
-    deltaY = aDeltaY;
-  }
 
   private static final Map<Direction, Direction> oppositeDirection = Map.of(
     NORTH, SOUTH,
@@ -71,7 +40,27 @@ public enum Direction {
     WEST, EAST
   );
 
-  public abstract List<Point> getNewlyOccupiedPositions(Piece piece, Point position);
+  private final int deltaX;
+  private final int deltaY;
+
+  private final Function<Piece, Integer> amountProvider;
+
+  Direction(int aDeltaX, int aDeltaY, Function<Piece, Integer> anAmountProvider) {
+    deltaX = aDeltaX;
+    deltaY = aDeltaY;
+    amountProvider = anAmountProvider;
+  }
+
+  public List<Point> getNewlyOccupiedPositions(Piece piece, Point position) {
+    final Point[] result = (Point[]) Array.newInstance(Point.class, amountProvider.apply(piece));
+
+    for (int i = 0; i < result.length; i++) {
+      result[i] = getNewlyOccupiedPosition(piece, position, i);
+    }
+    return Arrays.asList(result);
+  }
+
+  protected abstract Point getNewlyOccupiedPosition(Piece piece, Point position, int newPositionIndex);
 
   public int getDeltaX() {
     return deltaX;
