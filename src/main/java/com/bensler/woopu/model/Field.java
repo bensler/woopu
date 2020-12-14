@@ -58,10 +58,16 @@ public class Field {
   }
 
   public boolean isWinningPosition() {
-    return piecePositions.entrySet().stream().anyMatch(entry -> {return (
-      (entry.getKey().type == PieceType.BLUE)
-      && entry.getValue().equals(new Point(1, HEIGHT - PieceType.BLUE.height))
-    );});
+    final Optional<Piece> bluePiece = getBluePiece();
+
+    return bluePiece.isPresent() && getPosition(bluePiece.get()).equals(new Point(1, HEIGHT - PieceType.BLUE.height));
+  }
+
+  public Optional<Piece> getBluePiece() {
+    return piecePositions.entrySet().stream()
+      .map(entry -> entry.getKey())
+      .filter(piece -> (piece.type == PieceType.BLUE))
+      .findFirst();
   }
 
   public void setPosition(Piece piece, Point newPosition) {
@@ -123,6 +129,10 @@ public class Field {
 
   public boolean isPieceCovering(Piece piece, Point positionToTest) {
     return piece.covers(piecePositions.get(piece), positionToTest);
+  }
+
+  public void removePiece(Piece bluePiece) {
+    piecePositions.remove(bluePiece);
   }
 
 }

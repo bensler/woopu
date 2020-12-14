@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 import com.bensler.woopu.model.Direction;
 
-class MovingPieces {
+class MovingPieces implements Paintable {
 
   private final Move move;
   private final Set<Rectangle> clippingRects;
@@ -49,7 +49,8 @@ class MovingPieces {
     );
   }
 
-  void paint(InteractiveFieldComponent fieldComp, Graphics g, float progressRatio) {
+  @Override
+  public void paint(InteractiveFieldComponent fieldComp, Graphics g, float progressRatio) {
     final Shape oldClip = g.getClip();
 
     try {
@@ -72,7 +73,8 @@ class MovingPieces {
     fieldComp.paintSelection(g, deltaXPix, deltaYPix);
   }
 
-  Rectangle getClippingRect() {
+  @Override
+  public Rectangle getClippingRect() {
     return clippingRect;
   }
 

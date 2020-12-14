@@ -26,7 +26,7 @@ public class InteractiveFieldComponent extends FieldComponent {
   private final History history;
   private final Timer timer;
 
-  private AnimationProgress<MovingPieces> animation;
+  private AnimationProgress<? extends Paintable> animation;
 
   private Piece selectedPiece;
   private Point selection;
@@ -115,8 +115,24 @@ public class InteractiveFieldComponent extends FieldComponent {
 
   void moveDone() {
     animation = null;
+    finishIfWon();
+  }
+
+  private void finishIfWon() {
     if (field.isWinningPosition()) {
-      System.out.println("Hossa!");
+      field.getBluePiece().ifPresent(bluePiece -> {
+        final AnimationTask task = new AnimationTask(new AnimationProgress<>(
+          AnimationProgress.ATAN_TRANSFORMER,
+          new MovingWinningPiece(this, bluePiece),
+          thisAnimation -> animation = thisAnimation,
+          thisAnimation -> paintImmediately(thisAnimation.getContext().getClippingRect()),
+          thisAnimation -> {
+            animation = null;
+            field.removePiece(bluePiece);
+          }
+        ), 1000, FRAME_RATE);
+        timer.scheduleAtFixedRate(task, 0, task.getMsPerFrame());
+      });
     }
   }
 
