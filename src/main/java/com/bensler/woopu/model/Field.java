@@ -57,6 +57,13 @@ public class Field {
     return this;
   }
 
+  public boolean isWinningPosition() {
+    return piecePositions.entrySet().stream().anyMatch(entry -> {return (
+      (entry.getKey().type == PieceType.BLUE)
+      && entry.getValue().equals(new Point(1, HEIGHT - PieceType.BLUE.height))
+    );});
+  }
+
   public void setPosition(Piece piece, Point newPosition) {
     if (!piecePositions.containsKey(piece)) {
       throw new IllegalArgumentException(String.format("unknown piece %s", piece));

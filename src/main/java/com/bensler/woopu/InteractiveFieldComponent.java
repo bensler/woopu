@@ -108,9 +108,16 @@ public class InteractiveFieldComponent extends FieldComponent {
       new MovingPieces(this, move),
       thisAnimation -> animation = thisAnimation,
       thisAnimation -> paintImmediately(thisAnimation.getContext().getClippingRect()),
-      thisAnimation -> animation = null
+      thisAnimation -> moveDone()
     ), 500, FRAME_RATE);
     timer.scheduleAtFixedRate(task, 0, task.getMsPerFrame());
+  }
+
+  void moveDone() {
+    animation = null;
+    if (field.isWinningPosition()) {
+      System.out.println("Hossa!");
+    }
   }
 
   void mouseClicked(Point mousePos) {
