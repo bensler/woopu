@@ -122,7 +122,7 @@ public class InteractiveFieldComponent extends FieldComponent {
     if (field.isWinningPosition()) {
       field.getBluePiece().ifPresent(bluePiece -> {
         final AnimationTask task = new AnimationTask(new AnimationProgress<>(
-          AnimationProgress.ATAN_TRANSFORMER,
+          AnimationProgress.POWER_4_TRANSFORMER,
           new MovingWinningPiece(this, bluePiece),
           thisAnimation -> animation = thisAnimation,
           thisAnimation -> paintImmediately(thisAnimation.getContext().getClippingRect()),

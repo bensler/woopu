@@ -35,6 +35,9 @@ public class AnimationProgress<CONTEXT> {
 
   public static final Function<Float, Float> NOOP_TRANSFORMER = (ratio -> ratio);
   public static final Function<Float, Float> INVERSE_TRANSFORMER = (ratio -> (MAX_PROGRESS_RATIO - ratio));
+  public static final Function<Float, Float> POWER_2_TRANSFORMER = (ratio -> (ratio * ratio));
+  public static final Function<Float, Float> POWER_3_TRANSFORMER = (ratio -> (ratio * ratio * ratio));
+  public static final Function<Float, Float> POWER_4_TRANSFORMER = (ratio -> (ratio * ratio * ratio * ratio));
   public static final Function<Float, Float> ATAN_TRANSFORMER = new Function<>() {
 
     private final double ATAN2 = Math.atan(2.0f);
